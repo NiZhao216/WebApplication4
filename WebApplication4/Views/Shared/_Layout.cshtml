@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    <!-- 1. 导入线上样式库（简化版，避免解析冲突） -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "Heiti SC", sans-serif;
+        }
+
+        /* 小猫主题色定义 */
+        :root {
+            --catBrown: #8b5a2b;
+            --catCream: #f9f6f0;
+            --catOrange: #f4a460;
+            --catLight: #f0e6d6;
+            --catShadow: 0 4px 15px rgba(139, 90, 43, 0.12);
+            --catHover: 0 6px 20px rgba(139, 90, 43, 0.18);
+        }
+
+        /* 页面基础样式 */
+        body {
+            background-color: var(--catCream);
+            color: #5a4b38;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏（渐变+猫咪图标） */
+        .header {
+            background: linear-gradient(to right, var(--catBrown), var(--catOrange));
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(139, 90, 43, 0.2);
+            position: relative;
+        }
+
+        .header-title {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 猫咪图标动画（修复Razor解析：@@替代） */
+        .cat-wave {
+            animation: cat-wave 3s ease-in-out infinite;
+            font-size: 24px;
+        }
+
+        @@keyframes cat-wave {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(12deg); }
+        }
+
+        /* 主体内容区 */
+        .content-wrap {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        .content {
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--catLight);
+            box-shadow: var(--catShadow);
+            transition: all 0.3s ease;
+        }
+
+        .content:hover {
+            box-shadow: var(--catHover);
+        }
+
+        /* 底部脚注 */
+        .footer {
+            background-color: rgba(139, 90, 43, 0.1);
+            padding: 15px 0;
+            margin-top: auto;
+            text-align: center;
+            color: rgba(139, 90, 43, 0.7);
+            font-size: 14px;
+        }
+
+        /* 链接/按钮样式 */
+        a {
+            color: var(--catBrown);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--catOrange);
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: var(--catOrange);
+        }
+
+        button {
+            background-color: var(--catLight);
+            border: 1px solid var(--catBrown);
+            color: #5a4b38;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--catBrown);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        /* 响应式适配（修复Razor解析：@@替代） */
+        @@media (max-width: 768px) {
+            .header {
+                height: 60px;
+            }
+            .header-title {
+                font-size: 18px;
+            }
+            .content {
+                padding: 20px;
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="header">
+        <div class="header-title">
+            <i class="fas fa-cat cat-wave"></i>
+            我的第一个网站
+            <i class="fas fa-paw" style="font-size: 20px; opacity: 0.8;"></i>
+        </div>
+        <div style="position: absolute; right: 20px; top: 10px; color: #fff; opacity: 0.7;">
+            <i class="fas fa-cat"></i>
+        </div>
+    </div>
+
+    <!-- 主体内容区（Razor核心语法，无格式错误） -->
+    <div class="content-wrap">
+        <div class="content">
+            @RenderBody()
+        </div>
+    </div>
+
+    <!-- 底部脚注 -->
+    <div class="footer">
+        <i class="fas fa-paw" style="font-size: 12px; margin-right: 5px;"></i>
+        温馨小猫站 © 2026
+    </div>
+</body>
+</html>
