@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+
 // 1. 仅替换：移除 SQL Server 驱动，添加 MySQL 驱动
 using MySqlConnector;
 using System.Security.Claims;
@@ -24,7 +26,7 @@ namespace WebApplication4.Controllers.Login
             using (var conn = new MySqlConnection(constr))
             {
                 conn.Open();
-                string sql = "SELECT COUNT(*) FROM userstable WHERE username = @username AND pwd = @password";
+                string sql = "SELECT role FROM userstable WHERE username = @username AND pwd = @password";
                 // 4. 仅替换：SqlCommand → MySqlCommand
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
@@ -32,12 +34,16 @@ namespace WebApplication4.Controllers.Login
                     cmd.Parameters.AddWithValue("@username", username ?? string.Empty);
                     cmd.Parameters.AddWithValue("@password", password ?? string.Empty);
                     object result = cmd.ExecuteScalar();
-                    int num = Convert.ToInt32(result ?? 0);
+                    
 
-                    if (num > 0)
+                    if (result!=null)
                     {
                         // 未改动：Claims 认证逻辑完全保留
-                        var claims = new List<Claim> { new Claim(ClaimTypes.Name, username) };
+                        var claims = new List<Claim> 
+                        { 
+                            new Claim(ClaimTypes.Name, username) ,
+                            new Claim(ClaimTypes.Role,result.ToString() )
+                        };
                         var identity = new ClaimsIdentity(claims, "Cookies");
                         await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
                         return RedirectToAction("Index", "Home");

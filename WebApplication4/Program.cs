@@ -21,6 +21,9 @@ namespace WebApplication4
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
                     // 访问时自动续期
                     options.SlidingExpiration = true;
+                    // 权限跳转
+                    options.AccessDeniedPath = "/Home/Index";
+
                 });
 
             var app = builder.Build();
