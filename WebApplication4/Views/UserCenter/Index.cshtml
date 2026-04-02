@@ -1,11 +1,18 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "个人中心";
+    @model WebApplication4.Models.User;
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/usercenter.css" asp-append-version="true" />
 }
+<script type="text/javascript">window.onload=function()
+{
+        var message = "@Html.Raw(TempData["Message"])";
+        if(message!="")
+        alert(message);
+};</script>
 
 <div class="user-form-wrapper">
     <h2 class="page-title">
@@ -13,48 +20,57 @@
         个人中心
     </h2>
 
-    <form asp-controller="UserCenter" asp-action="Save" method="post" class="user-form">
+    <form asp-controller="UserCenter" action="/UserCenter/Save"  method="post" class="user-form">
         @Html.AntiForgeryToken()
-        <input type="hidden" name="id" value="0" />
+        
 
         <div class="form-item">
             <label class="form-label">用户名</label>
-            <input type="text" name="username" class="form-input" value="@ViewBag.Username" />
+                <input type="text" name="username" class="form-input" value="@Model.username" />
+        </div>
+        <div class="form-item">
+            <label class="form-label">id</label>
+            <input type="text" name="id" class="form-input" value="@Model.id" readonly />
         </div>
 
         <div class="form-item">
             <label class="form-label">邮箱</label>
-            <input type="email" name="email" class="form-input" value="@ViewBag.Email" />
+            <input type="email" name="email" class="form-input" value="@Model.email" />
         </div>
 
         <div class="form-item">
             <label class="form-label">手机号</label>
-            <input type="text" name="phone" class="form-input" value="@ViewBag.Phone" />
+            <input type="text" name="phone" class="form-input" value="@Model.phone" />
         </div>
 
         <div class="form-item">
             <label class="form-label">年龄</label>
-            <input type="text" name="age" class="form-input" value="@ViewBag.Age" />
+            <input type="text" name="age" class="form-input" value="@Model.age" />
         </div>
 
-        <div class="form-item">
-            <label class="form-label">性别</label>
-            <input type="text" name="sex" class="form-input" value="@ViewBag.Sex" />
-        </div>
+            <div class="form-item">
+                <label class="form-label">性别</label>
+                <select name="Sex" class="form-input">
+                    <!-- 关键：判断数据库的值，自动选中 -->
+                    <option value="未知" @(Model.sex == "未知" ? "selected":"")>未知</option>
+                    <option value="男" @(Model.sex == "男" ? "selected" : "")>男</option>
+                    <option value="女" @(Model.sex == "女" ? "selected" : "")>女</option>
+                </select>
+            </div>
 
         <div class="form-item">
             <label class="form-label">生日</label>
-            <input type="date" name="by" class="form-input" value="@ViewBag.By" />
+                <input type="date" name="by" class="form-input" value="@(Model.by.HasValue ? Model.by.Value.ToString("yyyy-MM-dd") : "")" />
         </div>
 
         <div class="form-item full-width">
             <label class="form-label">个人简介</label>
-            <textarea name="pr" class="form-input">@ViewBag.Pr</textarea>
+            <textarea name="pr" class="form-input">@Model.pr</textarea>
         </div>
 
         <div class="form-item full-width">
             <label class="form-label">详细地址</label>
-            <input type="text" name="address" class="form-input" value="@ViewBag.Address" />
+            <input type="text" name="address" class="form-input" value="@Model.address" />
         </div>
 
         <div class="btn-group">

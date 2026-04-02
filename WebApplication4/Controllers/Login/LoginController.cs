@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WebApplication4.Models;
 
 namespace WebApplication4.Controllers.Login
 {
@@ -56,26 +57,13 @@ namespace WebApplication4.Controllers.Login
 
                             // 2. 读取用户完整信息并添加到Claims（后续页面可直接获取）
                             User currentUser = await GetUserInfoByUsername(username);
-                            if (currentUser != null)
-                            {
-                                claims.Add(new Claim("Email", currentUser.email ?? string.Empty));
-                                claims.Add(new Claim("Phone", currentUser.phone ?? string.Empty));
-                                claims.Add(new Claim("Age", currentUser.age ?? string.Empty));
-                                claims.Add(new Claim("Sex", currentUser.sex ?? string.Empty));
-                                claims.Add(new Claim("Pr", currentUser.pr ?? string.Empty));
-                                claims.Add(new Claim("Address", currentUser.address ?? string.Empty));
-                                
-                                if (currentUser.by.HasValue)
-                                {
-                                    claims.Add(new Claim("by", currentUser.by.Value.ToString("yyyy-MM-dd")));
-                                }
-                            }
+                           
 
                             // 3. 生成登录Cookie
                             var identity = new ClaimsIdentity(claims, "Cookies");
                             await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
 
-                            return RedirectToAction("Index", "Home");
+                             return RedirectToAction("Index","Home");
                         }
                         else
                         {
@@ -125,7 +113,8 @@ namespace WebApplication4.Controllers.Login
                                 pr = reader["pr"]?.ToString() ?? string.Empty,
                                 age = reader["age"]?.ToString() ?? string.Empty,
                                 sex = reader["sex"]?.ToString() ?? string.Empty,
-                                by = reader["by"] as DateTime?
+                                by = reader["bry"] as DateTime?,
+                                id = (int)reader["id"]
                             };
                         }
                     }
