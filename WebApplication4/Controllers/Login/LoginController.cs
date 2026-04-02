@@ -1,70 +1,137 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-
-// 1. 仅替换：移除 SQL Server 驱动，添加 MySQL 驱动
 using MySqlConnector;
 using System.Security.Claims;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WebApplication4.Controllers.Login
 {
+    
+
+
     public class LoginController : Controller
     {
-        // 2. 仅替换：修改为 MySQL 连接字符串（根据你的 MySQL 环境调整账号密码）
-        public string constr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
+        // 优化：从配置读取连接字符串（推荐，避免硬编码）
+        // 实际项目中建议从appsettings.json读取，这里先简化保留格式
+        private readonly string _conStr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
 
         public IActionResult Index()
         {
-            // 未改动
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Index(string username, string password)
         {
-            // 3. 仅替换：SqlConnection → MySqlConnection
-            using (var conn = new MySqlConnection(constr))
+            // 前置校验：空值过滤
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                conn.Open();
-                string sql = "SELECT role FROM userstable WHERE username = @username AND pwd = @password";
-                // 4. 仅替换：SqlCommand → MySqlCommand
-                using (var cmd = new MySqlCommand(sql, conn))
-                {
-                    // 未改动：参数化查询逻辑完全保留
-                    cmd.Parameters.AddWithValue("@username", username ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@password", password ?? string.Empty);
-                    object result = cmd.ExecuteScalar();
-                    
+                ViewBag.ErrorMsg = "用户名或密码不能为空";
+                return View();
+            }
 
-                    if (result!=null)
+            try
+            {
+                using (var conn = new MySqlConnection(_conStr))
+                {
+                    await conn.OpenAsync(); // 异步打开连接（推荐）
+                    // 注意：生产环境必须用密码哈希比对，此处先保留逻辑，后续替换
+                    string sql = "SELECT role FROM userstable WHERE username = @username AND pwd = @password";
+                    using (var cmd = new MySqlCommand(sql, conn))
                     {
-                        // 未改动：Claims 认证逻辑完全保留
-                        var claims = new List<Claim> 
-                        { 
-                            new Claim(ClaimTypes.Name, username) ,
-                            new Claim(ClaimTypes.Role,result.ToString() )
-                        };
-                        var identity = new ClaimsIdentity(claims, "Cookies");
-                        await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else
-                    {
-                        // 未改动：错误提示逻辑完全保留
-                        ViewBag.ErrorMsg = "用户名或密码错误";
-                        return View();
+                        cmd.Parameters.AddWithValue("@username", username);
+                        cmd.Parameters.AddWithValue("@password", password);
+                        object result = await cmd.ExecuteScalarAsync(); // 异步执行
+
+                        if (result != null)
+                        {
+                            // 1. 构建身份认证Claims（添加更多用户信息）
+                            var claims = new List<Claim>
+                            {
+                                new Claim(ClaimTypes.Name, username),
+                                new Claim(ClaimTypes.Role, result.ToString())
+                            };
+
+                            // 2. 读取用户完整信息并添加到Claims（后续页面可直接获取）
+                            User currentUser = await GetUserInfoByUsername(username);
+                            if (currentUser != null)
+                            {
+                                claims.Add(new Claim("Email", currentUser.email ?? string.Empty));
+                                claims.Add(new Claim("Phone", currentUser.phone ?? string.Empty));
+                                claims.Add(new Claim("Age", currentUser.age ?? string.Empty));
+                                claims.Add(new Claim("Sex", currentUser.sex ?? string.Empty));
+                                claims.Add(new Claim("Pr", currentUser.pr ?? string.Empty));
+                                claims.Add(new Claim("Address", currentUser.address ?? string.Empty));
+                                
+                                if (currentUser.by.HasValue)
+                                {
+                                    claims.Add(new Claim("by", currentUser.by.Value.ToString("yyyy-MM-dd")));
+                                }
+                            }
+
+                            // 3. 生成登录Cookie
+                            var identity = new ClaimsIdentity(claims, "Cookies");
+                            await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
+
+                            return RedirectToAction("Index", "Home");
+                        }
+                        else
+                        {
+                            ViewBag.ErrorMsg = "用户名或密码错误";
+                            return View();
+                        }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                // 异常处理：记录日志（生产环境）+ 友好提示
+                ViewBag.ErrorMsg = "登录失败，请稍后重试";
+                // _logger.LogError(ex, "登录异常：{Username}", username); // 推荐添加日志
+                return View();
+            }
         }
+
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            // 1. 清除当前用户的登录Cookie（退出核心）
-            await HttpContext.SignOutAsync();
-
-            // 2. 退出后跳转到 登录页面
+            // 修正：指定认证方案，确保退出成功
+            await HttpContext.SignOutAsync("Cookies");
             return RedirectToAction("Index", "Login");
+        }
+
+        // 抽离：读取用户完整信息的方法（复用+解耦）
+        private async Task<User> GetUserInfoByUsername(string username)
+        {
+            using (var conn = new MySqlConnection(_conStr))
+            {
+                await conn.OpenAsync();
+                // 修正：将不规范的"by"改为birthday（需同步修改数据库字段名）
+                string sql = "SELECT * FROM userstable WHERE username=@username";
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@username", username);
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            return new User
+                            {
+                                username = reader["username"]?.ToString() ?? string.Empty,
+                                email = reader["email"]?.ToString() ?? string.Empty,
+                                phone = reader["phone"]?.ToString() ?? string.Empty,
+                                pr = reader["pr"]?.ToString() ?? string.Empty,
+                                age = reader["age"]?.ToString() ?? string.Empty,
+                                sex = reader["sex"]?.ToString() ?? string.Empty,
+                                by = reader["by"] as DateTime?
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }

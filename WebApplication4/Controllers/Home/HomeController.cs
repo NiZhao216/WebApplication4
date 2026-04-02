@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication4.Controllers.Home
 {
-    [Authorize]
+    
     [Authorize(Roles ="普通用户")]
     public class HomeController : Controller
     {

@@ -1,16 +1,33 @@
 ﻿@{
     ViewBag.Title = "主页";
-    
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    <head>
-        <title>@ViewBag.Title</title>
-    </head>
-    <body>
-        <h1>欢迎来到主页！</h1>
-        <p>这是一个简单的ASP.NET MVC应用程序的主页。</p>
-    <form action="/Login/Logout" method="post">
-        <button type="submit" style="padding: 8px 25px; background: red; color: white; border: 0; border-radius: 4px; cursor: pointer;">
-            退出登录
-        </button>
-    </form>
-    </body>
+
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+
+<div class="home-page" style="position:relative;">
+    <div class="home-hero">
+        <div class="hero-left">
+            <div class="hero-title">
+                <i class="fas fa-cat"></i>
+                欢迎，普通用户
+            </div>
+            <div class="hero-sub">这里是你的个人主页 —— 更亲切的小猫主题界面，快速访问常用功能与信息概览。</div>
+        </div>
+        <div class="hero-actions">
+            <button class="btn-primary">创建内容</button>
+            <button class="btn-outline">我的设置</button>
+        </div>
+    </div>
+
+    <div class="card-grid">
+        <div class="card">
+            <h3><i class="fas fa-paw icon"></i> 个人信息</h3>
+            <p>查看并编辑个人资料、联系方式等。</p>
+        </div>
+        <div class="card">
+            <h3><i class="fas fa-bell icon"></i> 最新消息</h3>
+            <p>系统通知、活动和推荐内容汇总。</p>
+        </div>
+    </div>
+</div>
