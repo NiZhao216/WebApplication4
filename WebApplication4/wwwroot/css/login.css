@@ -1,0 +1,141 @@
+/* 全局样式 - 匹配小猫主题 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft YaHei", "Heiti SC", sans-serif;
+}
+
+body {
+    background-color: #f9f6f0; /* 奶白底色（猫窝质感） */
+    color: #5a4b38;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* 登录表单容器（猫窝样式） */
+.login-container {
+    background-color: #fff;
+    border-radius: 24px;
+    padding: 40px 30px;
+    box-shadow: 0 6px 20px rgba(139, 90, 43, 0.12);
+    border: 1px solid #f0e6d6;
+    width: 100%;
+    max-width: 420px;
+}
+
+/* 登录标题（带猫咪图标） */
+.login-title {
+    text-align: center;
+    font-size: 26px;
+    color: #8b5a2b; /* 暖棕主色 */
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.login-title i {
+    animation: cat-wave 3s ease-in-out infinite;
+}
+
+/* 猫咪摆动动画 */
+@keyframes cat-wave {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(12deg); }
+}
+
+/* 输入框组（带小猫/锁图标） */
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #8b5a2b;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* 左边留图标位置 */
+    border: 1px solid #f0e6d6;
+    border-radius: 12px;
+    background-color: #f9f6f0;
+    font-size: 16px;
+    color: #5a4b38;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #f4a460; /* 浅橘高亮 */
+    box-shadow: 0 0 0 3px rgba(244, 164, 96, 0.15);
+}
+
+/* 输入框前的小猫/锁图标 */
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 38px;
+    color: #8b5a2b;
+    font-size: 18px;
+}
+
+/* 错误提示样式（匹配主题） */
+.error-tip {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    display: none;
+    padding-left: 5px;
+}
+
+.error-tip.show {
+    display: block;
+}
+
+/* 登录按钮（小猫风格） */
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #8b5a2b;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.login-btn:hover {
+    background-color: #a67c52;
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(139, 90, 43, 0.2);
+}
+
+/* 注册链接（猫爪下划线） */
+.register-link {
+    text-align: center;
+    display: block;
+    color: #8b5a2b;
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.register-link:hover {
+    color: #f4a460;
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: #f4a460;
+}
