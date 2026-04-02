@@ -1,45 +1,142 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using MySqlConnector;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using WebApplication4.Models;
 
 namespace WebApplication4.Controllers.UserCenter
 {
+   
+
+
     [Authorize]
+
     public class UserCenterController : Controller
-    {
+    { 
+        
         [HttpGet]
         public IActionResult Index()
         {
-            // Prefill common fields from claims (if present)
-            ViewBag.Username = User.Identity?.Name ?? string.Empty;
-            ViewBag.Email = User.FindFirst(ClaimTypes.Email)?.Value ?? User.FindFirst("Email")?.Value ?? string.Empty;
-            ViewBag.Phone = User.FindFirst("Phone")?.Value ?? string.Empty;
-            ViewBag.Age = User.FindFirst("Age")?.Value ?? string.Empty;
-            ViewBag.Sex = User.FindFirst("Sex")?.Value ?? string.Empty;
-            ViewBag.By = User.FindFirst("by")?.Value ?? string.Empty;
-            ViewBag.Pr = User.FindFirst("Pr")?.Value ?? string.Empty;
-            ViewBag.Address = User.FindFirst("Address")?.Value ?? string.Empty;
+            
+            User currentUser = GetUserInfoByUsername(User.Identity?.Name ?? string.Empty).Result;
 
-            return View();
+
+            return View(currentUser);
         }
-
+        private readonly string constr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(int id, string username, string pwd, string email, string phone, string age, string sex, string by, string pr, string address)
+        public async Task<IActionResult> Save(int id, string username, string email, string phone, string age, string sex, DateTime? by, string address,string pr)
         {
             // Basic server-side validation (can be expanded)
             if (string.IsNullOrWhiteSpace(username))
             {
+
                 TempData["Message"] = "用户名不能为空";
                 return RedirectToAction("Index");
             }
 
-            // TODO: Persist changes to database. For now, simulate async work and return success.
-            await Task.CompletedTask;
+            using (var conn = new MySqlConnection(constr))
+            {
+                await conn.OpenAsync();
+                // Update user information
+                string sql = @"
+UPDATE userstable 
+SET username = @username, 
+    email = @email, 
+    phone = @phone, 
+    age = @age,
+    sex = @sex,
+    bry = @by,
+    address = @address,
+    pr = @pr 
+WHERE 
+    username = @name 
+    AND 
+    NOT EXISTS (
+        SELECT 1 FROM (
+            SELECT username FROM userstable WHERE username = @username AND id != @id
+        ) AS temp
+    )
+";
+                MySqlCommand cmd=new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@name", User.Identity?.Name ?? string.Empty);
+                cmd.Parameters.AddWithValue("@username", username);
+                cmd.Parameters.AddWithValue("@email", email);
+                cmd.Parameters.AddWithValue("@phone", phone);
+                cmd.Parameters.AddWithValue("@age", age);
+                cmd.Parameters.AddWithValue("@by", by);
+                cmd.Parameters.AddWithValue("@sex", sex);
+                cmd.Parameters.AddWithValue("@address", address);
+                cmd.Parameters.AddWithValue("@pr", pr);
+                cmd.Parameters.AddWithValue("@id", id);
+                int num=  cmd.ExecuteNonQuery();
+                if (num > 0)
+                {
+                    if (User.Identity.Name != username)
+                    {
+                        // 1. 取出原来的权限角色
+                        string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-            TempData["Message"] = "保存成功";
-            return RedirectToAction("Index");
+                        // 2. 只用 用户名 + 权限 重新生成（干净！）
+                        var newClaims = new List<Claim>
+                         {
+                              new Claim(ClaimTypes.Name, username),
+                              new Claim(ClaimTypes.Role, role) // 权限还在！
+                          };
+
+                        // 3. 重新登录
+                        var identity = new ClaimsIdentity(newClaims, User.Identity.AuthenticationType);
+                        await HttpContext.SignInAsync(new ClaimsPrincipal(identity));
+                    }
+                    TempData["Message"] = "保存成功";
+                    return RedirectToAction("Index");
+                }
+                    
+                
+                else
+                {
+                    TempData["Message"] = "修改失败,用户名重复";
+                    return RedirectToAction("Index");
+                }
+
+                
+            }
+        }
+        private async Task<User> GetUserInfoByUsername(string username)
+        {
+            using (var conn = new MySqlConnection(constr))
+            {
+                await conn.OpenAsync();
+                // 修正：将不规范的"by"改为birthday（需同步修改数据库字段名）
+                string sql = "SELECT * FROM userstable WHERE username=@username";
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@username", username);
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            return new User
+                            {
+                                username = reader["username"]?.ToString() ?? string.Empty,
+                                email = reader["email"]?.ToString() ?? string.Empty,
+                                phone = reader["phone"]?.ToString() ?? string.Empty,
+                                pr = reader["pr"]?.ToString() ?? string.Empty,
+                                age = reader["age"]?.ToString() ?? string.Empty,
+                                sex = reader["sex"]?.ToString() ?? string.Empty,
+                                by = reader["bry"] as DateTime?,
+                                id = (int)reader["id"],
+                                address= reader["address"]?.ToString() ?? string.Empty
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }
