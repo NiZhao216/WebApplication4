@@ -1,53 +1,39 @@
 ﻿@{
-    Layout = null;
     ViewBag.Title = "小猫登录页面";
 }
 
-<!-- 引入Font Awesome图标库（小猫/猫爪/锁图标） -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="~/css/login.css" />
+<!-- 引入登录页专属CSS + 图标库 -->
+<link rel="stylesheet" href="~/css/kitten-login.css" />
 
 <!-- 登录表单容器 -->
 <div class="login-container">
-    <!-- 登录标题（带猫咪图标） -->
-    <h2 class="login-title">
+    <h2>
         <i class="fas fa-cat"></i>
         小猫登录站
     </h2>
 
-    <!-- 表单 -->
-    <form method="post" action="/Login/Index" onsubmit="return d()" >
-        <!-- 用户名输入框（带小猫图标） -->
-        <div class="input-group">
+    <form method="post" action="/Login/Index" onsubmit="return d()" class="login-form">
+        <div class="form-group">
             <label for="username">用户名</label>
-            <i class="fas fa-user-cat"></i>
             <input type="text" id="username" name="username" placeholder="请输入用户名">
         </div>
 
-        <!-- 密码输入框（带锁图标） -->
-        <div class="input-group">
+        <div class="form-group">
             <label for="password">密码</label>
-            <i class="fas fa-lock"></i>
             <input type="password" id="password" name="password" placeholder="请输入密码">
-            
-            <!-- 错误提示 -->
             @if (!string.IsNullOrEmpty(ViewBag.ErrorMsg))
             {
-                <div class="error-tip show">@Html.Raw(ViewBag.ErrorMsg)</div>
-            }
-            else
-            {
-                <div class="error-tip"></div>
+                <div class="error-msg">@Html.Raw(ViewBag.ErrorMsg)</div>
             }
         </div>
 
-        <!-- 登录按钮 -->
-        <input type="submit" value="登录" class="login-btn">
+        <div>
+            <button type="submit" class="login-btn">登录</button>
+        </div>
 
-        <!-- 注册链接 -->
-        <a href="/Zc/Index" class="register-link">
-            <i class="fas fa-paw"></i> 还没有账号？点击注册
-        </a>
+        <div class="register-link">
+            <a href="/Zc/Index"><i class="fas fa-paw"></i> 还没有账号？点击注册</a>
+        </div>
     </form>
 </div>
 

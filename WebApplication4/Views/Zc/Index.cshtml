@@ -1,67 +1,48 @@
 ﻿@{
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "注册";
 }
- 
+
+<!-- 引入注册页专属小猫风格CSS -->
+@section Styles {
+    <link rel="stylesheet" href="~/css/kitten-register.css" />
+}
+
 <script>
-        window.onload = function() {
-        // 优先使用页面中由后端注入的全局变量 window.viewbagMessage
+    window.onload = function() {
         var message = "@Html.Raw(ViewBag.Message)";
-   
-
-
         if (message && message.trim() !== "") {
             alert(message);
         }
     };
+</script>
 
-    </script>
+<div class="zc-wrap page-card">
+    <h2><i class="fa-solid fa-cat" aria-hidden="true"></i> 小猫注册站</h2>
 
-
-<!-- 引入样式表（移动至wwwroot/css/zc.css） -->
-<link rel="stylesheet" href="~/css/zc.css" asp-append-version="true" />
-
-<!-- 原页面的 HTML 内容（保留） -->
-<div class="register-container">
-    <!-- 注册标题（带猫咪图标） -->
-    <h2 class="register-title">
-        <i class="fas fa-cat"></i>
-        小猫注册站
-    </h2>
-
-    <!-- 表单（保留原有验证函数kong()） -->
-    <form method="post" action="/Zc/Index" onsubmit="return kong()">
-        <!-- 用户名输入框（带猫咪用户图标） -->
-        <div class="input-group">
+    <form method="post" action="/Zc/Index" onsubmit="return kong()" class="form-grid">
+        <div>
             <label for="username">用户名</label>
-            <i class="fas fa-user-cat"></i>
-            <input type="text" id="username" name="username" placeholder="请输入用户名（不能含空格）">
+            <input type="text" id="username" name="username" placeholder="请输入用户名（不能含空格）" />
         </div>
 
-        <!-- 密码输入框（带锁图标） -->
-        <div class="input-group">
+        <div>
             <label for="password">密码</label>
-            <i class="fas fa-lock"></i>
-            <input type="password" id="password" name="password" placeholder="请输入密码">
+            <input type="password" id="password" name="password" placeholder="请输入密码" />
         </div>
 
-        <!-- 确认密码输入框（带重复锁图标） -->
-        <div class="input-group">
+        <div>
             <label for="password1">确认密码</label>
-            <i class="fas fa-lock-open"></i>
-            <input type="password" id="password1" name="password1" placeholder="请再次输入密码">
+            <input type="password" id="password1" name="password1" placeholder="请再次输入密码" />
         </div>
 
-        <!-- 按钮组（注册+返回） -->
-        <div class="btn-group">
-            <input type="submit" value="注册" class="register-btn">
-            <input type="button" value="返回登录页面" onclick="window.location.href='/Login/Index'" class="back-btn">
+        <div class="actions">
+            <button type="submit" class="btn-cta">注册</button>
+            <button type="button" class="btn-secondary" onclick="window.location.href='/Login/Index'">返回登录页面</button>
         </div>
     </form>
 </div>
 
-<!-- 引入外部脚本（直接在页面中引入，因为本页不使用 Layout） -->
-<script src="~/js/zc.js" asp-append-version="true">
-
-    </script>
-
+@section Scripts {
+    <script src="@(Url.Content("~/js/zc.js"))" asp-append_version="true"></script>
+}

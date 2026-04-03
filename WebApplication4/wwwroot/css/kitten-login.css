@@ -1,0 +1,106 @@
+﻿/* 小猫健康院 - 登录页面专属样式 */
+.login-container {
+    max-width: 450px;
+    margin: 60px auto;
+    padding: 40px 30px;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0 8px 20px rgba(255, 182, 193, 0.25);
+    border: 2px solid #FFE6EA;
+}
+
+    /* 登录标题 */
+    .login-container h2 {
+        text-align: center;
+        color: #FF6B8B;
+        margin-bottom: 35px;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+        .login-container h2 i {
+            color: #FF8FA3;
+            font-size: 32px;
+        }
+
+/* 表单组 */
+.login-form .form-group {
+    margin-bottom: 25px;
+}
+
+/* 标签 */
+.login-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #5A4B50;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+/* 输入框 */
+.login-form input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #FFE6EA;
+    border-radius: 15px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+    .login-form input:focus {
+        border-color: #FF8FA3;
+        box-shadow: 0 0 8px rgba(255, 143, 163, 0.2);
+    }
+
+/* 错误提示 */
+.error-msg {
+    color: #FF4D6D;
+    font-size: 14px;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* 登录按钮 */
+.login-btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #FF8FA3, #FF6B8B);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(255, 143, 163, 0.3);
+    }
+
+/* 注册链接 */
+.register-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+    .register-link a {
+        color: #FF6B8B;
+        text-decoration: none;
+        font-size: 15px;
+        transition: 0.3s;
+    }
+
+        .register-link a:hover {
+            color: #FF8FA3;
+        }
+
+    .register-link i {
+        margin-right: 5px;
+    }

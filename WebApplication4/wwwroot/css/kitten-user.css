@@ -1,0 +1,179 @@
+﻿/* 小猫健康院 - 个人中心专属样式 */
+.user-wrap {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 45px 40px;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0 8px 20px rgba(255, 182, 193, 0.25);
+    border: 2px solid #FFE6EA;
+}
+
+    /* 标题样式 */
+    .user-wrap h2 {
+        text-align: center;
+        color: #FF6B8B;
+        margin-bottom: 40px;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+        .user-wrap h2 i {
+            color: #FF8FA3;
+            font-size: 30px;
+        }
+
+/* 表单布局 */
+.user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* 表单项 */
+.form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+    /* 标签 */
+    .form-item label {
+        color: #5A4B50;
+        font-weight: 500;
+        font-size: 15px;
+    }
+
+    /* 输入框 / 下拉框 / 文本域 */
+    .form-item input,
+    .form-item select,
+    .form-item textarea {
+        padding: 12px 15px;
+        border: 2px solid #FFE6EA;
+        border-radius: 15px;
+        font-size: 16px;
+        outline: none;
+        transition: all 0.3s;
+        resize: vertical;
+    }
+
+        /* 聚焦效果 */
+        .form-item input:focus,
+        .form-item select:focus,
+        .form-item textarea:focus {
+            border-color: #FF8FA3;
+            box-shadow: 0 0 8px rgba(255, 143, 163, 0.2);
+        }
+
+/* 只读输入框样式 */
+input[readonly] {
+    background-color: #FFF5F7;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* 头像区域专属样式 */
+.avatar-area {
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+/* 头像预览图 */
+
+#avatar {
+    width: 110px !important;
+    height: 110px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 3px solid #FFE6EA;
+    transition: all 0.3s;
+   
+}
+
+
+/* 头像上传按钮 */
+#avatarInput {
+    display: none;
+}
+
+.form-item label[for="avatarInput"] {
+    background: #FFE6EA;
+    color: #FF6B8B;
+    padding: 6px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+    .form-item label[for="avatarInput"]:hover {
+        background: #FFD1DC;
+    }
+
+/* 按钮组 */
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+/* 主按钮（保存） */
+.btn-primary {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #FF8FA3, #FF6B8B);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+/* 重置按钮 */
+.btn-reset {
+    padding: 12px 25px;
+    background: #FFE6EA;
+    color: #FF6B8B;
+    border: none;
+    border-radius: 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+/* 返回按钮 */
+.btn-back {
+    padding: 12px 25px;
+    background: #f8f9fa;
+    color: #5A4B50;
+    border: 2px solid #FFE6EA;
+    border-radius: 18px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+/* 按钮悬停效果 */
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255,143,163,0.3);
+}
+
+.btn-reset:hover {
+    background: #FFD1DC;
+    transform: translateY(-2px);
+}
+
+.btn-back:hover {
+    background: #FFE6EA;
+    transform: translateY(-2px);
+}

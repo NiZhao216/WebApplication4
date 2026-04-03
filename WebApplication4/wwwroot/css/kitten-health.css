@@ -1,0 +1,161 @@
+﻿/* 小猫健康院 - 独立样式文件 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "微软雅黑", "PingFang SC", sans-serif;
+}
+
+/* 全局背景 */
+body {
+    background-color: #FFF5F7;
+    color: #5A4B50;
+    line-height: 1.6;
+}
+
+/* 外层容器 */
+#kitten-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 导航栏样式 */
+header nav {
+    background-color: #FFD1DC;
+    border-bottom: 3px solid #FFB6C1;
+    padding: 12px 20px;
+    box-shadow: 0 2px 8px rgba(255, 182, 193, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* 导航左侧 Logo + 菜单 */
+nav > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+/* Logo 样式 */
+nav a[href="/"] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #FF6B8B;
+    text-decoration: none;
+}
+
+/* 猫爪图标 */
+.fa-paw {
+    color: #FF8FA3;
+    font-size: 20px;
+}
+
+/* 导航链接 */
+div[role="navigation"] {
+    display: flex;
+    gap: 20px;
+}
+
+    div[role="navigation"] a {
+        color: #5A4B50;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+
+        div[role="navigation"] a:hover {
+            color: #FF6B8B;
+            transform: translateY(-2px);
+        }
+
+/* 右侧操作栏（登录/注册/退出） */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+    .nav-actions a, .nav-actions button {
+        background: #FF8FA3;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .nav-actions a:hover, .nav-actions button:hover {
+            background: #FF6B8B;
+        }
+
+    .nav-actions span {
+        color: #5A4B50;
+        font-weight: 500;
+    }
+
+/* 主体内容 */
+main {
+    flex: 1;
+    padding: 40px 20px;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 页脚 */
+footer {
+    background-color: #FFD1DC;
+    border-top: 3px solid #FFB6C1;
+    text-align: center;
+    padding: 20px;
+    color: #886670;
+    margin-top: 30px;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+    header nav {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav > div:first-child {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+/* 导航栏用户头像 */
+.nav-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #FF8FA3;
+    vertical-align: middle;
+    margin-right: 6px;
+    cursor: pointer;
+}
+    .nav-avatar:hover {
+        border-color: #FF6B8B;
+        transform: scale(1.05);
+    }
+
+/* 头像+用户名容器 */
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #5A4B50;
+    font-weight: 500;
+}
