@@ -56,7 +56,7 @@ namespace WebApplication4.Controllers.Login
                             };
 
                             // 2. 读取用户完整信息并添加到Claims（后续页面可直接获取）
-                            User currentUser = await GetUserInfoByUsername(username);
+                           
                            
 
                             // 3. 生成登录Cookie
@@ -114,7 +114,8 @@ namespace WebApplication4.Controllers.Login
                                 age = reader["age"]?.ToString() ?? string.Empty,
                                 sex = reader["sex"]?.ToString() ?? string.Empty,
                                 by = reader["bry"] as DateTime?,
-                                id = (int)reader["id"]
+                                id = (int)reader["id"],
+                                avatar = reader["Avatar"]?.ToString() ?? string.Empty
                             };
                         }
                     }

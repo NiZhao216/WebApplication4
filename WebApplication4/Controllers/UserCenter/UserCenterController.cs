@@ -17,6 +17,12 @@ namespace WebApplication4.Controllers.UserCenter
     public class UserCenterController : Controller
     { 
         
+        private readonly IWebHostEnvironment _webHost;
+        public UserCenterController(IWebHostEnvironment webHost)
+        {
+            _webHost = webHost;
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -29,7 +35,7 @@ namespace WebApplication4.Controllers.UserCenter
         private readonly string constr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(int id, string username, string email, string phone, string age, string sex, DateTime? by, string address,string pr)
+        public async Task<IActionResult> Save(int id, string username, string email, string phone, string age, string sex, DateTime? by, string address,string pr,IFormFile avatar,string oldAvatar)
         {
             // Basic server-side validation (can be expanded)
             if (string.IsNullOrWhiteSpace(username))
@@ -52,7 +58,8 @@ SET username = @username,
     sex = @sex,
     bry = @by,
     address = @address,
-    pr = @pr 
+    pr = @pr, 
+    avatar=@avatar
 WHERE 
     username = @name 
     AND 
@@ -73,6 +80,26 @@ WHERE
                 cmd.Parameters.AddWithValue("@address", address);
                 cmd.Parameters.AddWithValue("@pr", pr);
                 cmd.Parameters.AddWithValue("@id", id);
+                string filePath = string.Empty; // 默认头像路径
+                if (avatar != null && avatar.Length >= 0)
+                {
+                    string uploadsFolder = Path.Combine(_webHost.WebRootPath, "images", "avatar");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + avatar.FileName;
+                    filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (FileStream s = new FileStream(filePath, FileMode.Create))
+                    {
+                        await avatar.CopyToAsync(s);
+                    }
+                    filePath="/images/avatar/" + Path.GetFileName(filePath); // 存储相对路径
+                }
+                else
+                {
+                    filePath = oldAvatar; // 保持原头像不变
+                    
+                   
+                }
+               
+                cmd.Parameters.AddWithValue("@avatar", filePath); 
                 int num=  cmd.ExecuteNonQuery();
                 if (num > 0)
                 {
@@ -130,7 +157,8 @@ WHERE
                                 sex = reader["sex"]?.ToString() ?? string.Empty,
                                 by = reader["bry"] as DateTime?,
                                 id = (int)reader["id"],
-                                address= reader["address"]?.ToString() ?? string.Empty
+                                address= reader["address"]?.ToString() ?? string.Empty,
+                                avatar= reader["avatar"]?.ToString() ?? string.Empty
                             };
                         }
                     }

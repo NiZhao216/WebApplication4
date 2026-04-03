@@ -1,0 +1,109 @@
+﻿/* 小猫健康院 - 注册页面专属样式 */
+.zc-wrap {
+    width: 620px;
+    margin: 32px auto;
+    padding: 40px 35px;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0 8px 20px rgba(255, 182, 193, 0.25);
+    border: 2px solid #FFE6EA;
+}
+
+    /* 注册标题 */
+    .zc-wrap h2 {
+        text-align: center;
+        color: #FF6B8B;
+        margin-bottom: 35px;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+        .zc-wrap h2 i {
+            font-size: 30px;
+        }
+
+/* 表单网格布局 */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+    /* 表单项 */
+    .form-grid > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* 标签 */
+    .form-grid label {
+        color: #5A4B50;
+        font-weight: 500;
+        font-size: 15px;
+    }
+
+    /* 输入框 */
+    .form-grid input {
+        padding: 12px 15px;
+        border: 2px solid #FFE6EA;
+        border-radius: 15px;
+        font-size: 16px;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+        .form-grid input:focus {
+            border-color: #FF8FA3;
+            box-shadow: 0 0 8px rgba(255, 143, 163, 0.2);
+        }
+
+    /* 按钮组 */
+    .form-grid .actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+
+/* 主按钮（注册） */
+.btn-cta {
+    padding: 13px 30px;
+    background: linear-gradient(135deg, #FF8FA3, #FF6B8B);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+    .btn-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(255, 143, 163, 0.3);
+    }
+
+/* 次按钮（返回登录） */
+.btn-secondary {
+    padding: 13px 30px;
+    background: #FFE6EA;
+    color: #FF6B8B;
+    border: none;
+    border-radius: 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+    .btn-secondary:hover {
+        background: #FFD1DC;
+        transform: translateY(-2px);
+    }
