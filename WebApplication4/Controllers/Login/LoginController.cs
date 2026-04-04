@@ -20,6 +20,10 @@ namespace WebApplication4.Controllers.Login
 
         public IActionResult Index()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
@@ -48,11 +52,26 @@ namespace WebApplication4.Controllers.Login
 
                         if (result != null)
                         {
+                            string token=Guid.NewGuid().ToString();
                             // 1. 构建身份认证Claims（添加更多用户信息）
-                            var claims = new List<Claim>
+                            
+                               
+                            string sql2 = "UPDATE userstable SET token=@token WHERE username=@username";
+                            using (MySqlCommand tocmd = new MySqlCommand(sql2, conn))
+                            {
+                                tocmd.Parameters.AddWithValue("@token", token);
+                                tocmd.Parameters.AddWithValue("@username", username);
+                                int num = await tocmd.ExecuteNonQueryAsync();
+                                if (!(num > 0))
+                                {
+                                    return View();
+                                }
+                            }
+                                var claims = new List<Claim>
                             {
                                 new Claim(ClaimTypes.Name, username),
-                                new Claim(ClaimTypes.Role, result.ToString())
+                                new Claim(ClaimTypes.Role, result.ToString()),
+                                new Claim("logintoken",token)
                             };
 
                             // 2. 读取用户完整信息并添加到Claims（后续页面可直接获取）
@@ -86,6 +105,30 @@ namespace WebApplication4.Controllers.Login
         public async Task<IActionResult> Logout()
         {
             // 修正：指定认证方案，确保退出成功
+            string? username = User.Identity?.Name;
+
+            // 2. 如果用户已登录，清空数据库中的 logintoken
+            if (!string.IsNullOrEmpty(username))
+            {
+                try
+                {
+                    using (var conn = new MySqlConnection(_conStr))
+                    {
+                        await conn.OpenAsync();
+                        // SQL：把当前用户的token置空
+                        string sql = "UPDATE userstable SET token = null WHERE username = @username";
+                        using (var cmd = new MySqlCommand(sql, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@username", username);
+                            await cmd.ExecuteNonQueryAsync(); // 异步执行
+                        }
+                    }
+                }
+                catch
+                {
+                    // 数据库异常不影响退出，继续执行登出
+                }
+            }
             await HttpContext.SignOutAsync("Cookies");
             return RedirectToAction("Index", "Login");
         }

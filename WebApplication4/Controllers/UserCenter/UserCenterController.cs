@@ -100,7 +100,7 @@ WHERE
                 }
                
                 cmd.Parameters.AddWithValue("@avatar", filePath); 
-                int num=  cmd.ExecuteNonQuery();
+                int num= await cmd.ExecuteNonQueryAsync();
                 if (num > 0)
                 {
                     if (User.Identity.Name != username)
@@ -112,7 +112,8 @@ WHERE
                         var newClaims = new List<Claim>
                          {
                               new Claim(ClaimTypes.Name, username),
-                              new Claim(ClaimTypes.Role, role) // 权限还在！
+                              new Claim(ClaimTypes.Role, role), // 权限还在！
+                              new Claim("logintoken", User.FindFirstValue("logintoken"))
                           };
 
                         // 3. 重新登录
