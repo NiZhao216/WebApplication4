@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
+using Logintokenfilter;
 namespace WebApplication4
 {
     public class Program
@@ -10,6 +11,11 @@ namespace WebApplication4
 
             // 1. 添加控制器与视图服务（默认已有）
             builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                // 👇 这一行就是【全局注册】！所有请求自动拦截
+                options.Filters.Add<Logintokenfilterz>();
+            });
 
             // 2. 配置 Cookie 认证（核心！）
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
