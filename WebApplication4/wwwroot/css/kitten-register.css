@@ -1,8 +1,8 @@
 ﻿/* 小猫健康院 - 注册页面专属样式 */
 .zc-wrap {
-    width: 620px;
+    max-width: 450px; /* 改为450px，和登录页统一 */
     margin: 32px auto;
-    padding: 40px 35px;
+    padding: 40px 30px; /* 内边距同步为30px，和登录页一致 */
     background: #ffffff;
     border-radius: 25px;
     box-shadow: 0 8px 20px rgba(255, 182, 193, 0.25);
@@ -48,12 +48,14 @@
 
     /* 输入框 */
     .form-grid input {
+        width: 100%;
         padding: 12px 15px;
         border: 2px solid #FFE6EA;
         border-radius: 15px;
         font-size: 16px;
         outline: none;
         transition: all 0.3s;
+        box-sizing: border-box;
     }
 
         .form-grid input:focus {
