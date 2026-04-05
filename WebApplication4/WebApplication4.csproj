@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Catlist\" />
     <Folder Include="wwwroot\images\catavatar\" />
   </ItemGroup>
 
