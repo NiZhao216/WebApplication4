@@ -12,13 +12,14 @@
             <i class="fas fa-cat"></i> 我的小猫档案
         </div>
 
-        <form method="post" action="Cat/SaveCat" class="pet-card">
+        <form method="post" action="/Cat/SaveCat" class="pet-card">
             <!-- 基础信息 -->
             <div class="form-group">
                 <h4 class="section-title">
                     <i class="fas fa-paw"></i> 基础信息
                 </h4>
                 <div class="grid-2">
+                    <input type="hidden" class="old-cat-name" name="oldname" value="@Model.CatName" />
                     <div>
                         <label class="form-label">猫咪昵称</label>
                         <input name="CatName" value="@Model.CatName" class="form-input" placeholder="请输入猫咪名字">

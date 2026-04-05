@@ -1,0 +1,202 @@
+﻿/* 小猫健康院 - 猫咪档案列表专属样式 */
+@import url("kitten-health.css");
+
+/* 页面外层容器 */
+.cat-list-wrapper {
+    background-color: #FFF5F7;
+    padding: 30px 0;
+    min-height: calc(100vh - 150px);
+}
+
+/* 内容容器 */
+.cat-list-container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 页面标题 */
+.cat-list-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #FF6B8B;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+    .cat-list-title i {
+        color: #FF8FA3;
+        font-size: 32px;
+    }
+
+/* 按钮操作区域 */
+.cat-list-actions {
+    text-align: right;
+    margin-bottom: 25px;
+}
+
+/* 新建按钮 */
+.btn-add {
+    background: linear-gradient(135deg, #FF8FA3, #FF6B8B);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 18px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(255, 143, 163, 0.3);
+    }
+
+/* 编辑切换按钮 */
+.btn-edit {
+    background: #FFE6EA;
+    color: #FF6B8B;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+    .btn-edit:hover {
+        background: #FFD1DC;
+        transform: translateY(-2px);
+    }
+
+/* 空状态样式 */
+.empty-box {
+    text-align: center;
+    padding: 60px 20px;
+    background: #ffffff;
+    border-radius: 25px;
+    box-shadow: 0 8px 20px rgba(255, 182, 193, 0.1);
+    border: 2px solid #FFE6EA;
+}
+
+    .empty-box i {
+        color: #FF8FA3;
+        font-size: 48px;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .empty-box p {
+        color: #886670;
+        font-size: 16px;
+    }
+
+/* 猫咪列表容器 */
+.cat-table {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 猫咪列表行 - 关键：确保内部元素不换行 */
+.cat-row {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(255, 182, 193, 0.15);
+    border: 2px solid #FFE6EA;
+    transition: all 0.3s;
+    /* 核心：防止行内元素换行 */
+    white-space: nowrap;
+}
+
+    .cat-row:hover {
+        box-shadow: 0 6px 16px rgba(255, 182, 193, 0.2);
+        transform: translateY(-1px);
+    }
+
+/* 猫咪信息项 */
+.cat-info {
+    width: 25%; /* 调整宽度，给操作按钮留空间 */
+    font-size: 16px;
+    color: #5A4B50;
+    font-weight: 500;
+    /* 防止文字换行 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 操作按钮容器 - 核心：横向并排，不换行 */
+.cat-operate {
+    display: none;
+    margin-left: auto;
+    /* 关键：flex横向布局，间距统一 */
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 按钮之间的间距 */
+    width: auto; /* 自适应宽度，不挤压 */
+}
+
+/* 编辑档案按钮 - 美化 */
+.btn-blue {
+    background: #FFE6EA;
+    color: #FF6B8B;
+    padding: 6px 12px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    /* 防止按钮内文字换行 */
+    white-space: nowrap;
+}
+
+    .btn-blue:hover {
+        background: #FFD1DC;
+        transform: translateY(-1px);
+    }
+
+/* 删除按钮 - 美化 */
+.btn-red {
+    background: #FF4D6D;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    /* 防止按钮内文字换行 */
+    white-space: nowrap;
+}
+
+    .btn-red:hover {
+        background: #FF6B8B;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(255, 77, 109, 0.2);
+    }
+
+/* 响应式适配（移动端也不换行） */
+@media (max-width: 768px) {
+    .cat-row {
+        flex-wrap: wrap; /* 移动端允许行换行，但按钮仍横向 */
+    }
+
+    .cat-info {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .cat-operate {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

@@ -33,5 +33,7 @@ namespace WebApplication4.Models
         public DateTime? NextDewormDate { get; set; }
         // 关联用户ID
         public string Username { get; set; } = string.Empty;
+        
+        public string oldname { get; set; } = string.Empty;
     }
 }
