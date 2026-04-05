@@ -45,7 +45,7 @@ namespace WebApplication4.Controllers.Home
                     }
                 }
             }
-            return null;
+            return null!;
         }
 
     }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using MySqlConnector;
 using System.Collections.Specialized;
 using System.Security.Claims;
-namespace Logintokenfilter
+namespace WebApplication4
 {
     public class Logintokenfilterz: IAsyncAuthorizationFilter
     {
@@ -17,7 +17,7 @@ namespace Logintokenfilter
                 {
                     await conn.OpenAsync();
                     string sql= "SELECT token FROM userstable WHERE username = @username";
-                    MySqlCommand cmd=new MySqlCommand(sql, conn);
+                    MySqlCommand cmd=new (sql, conn);
                     cmd.Parameters.AddWithValue("@username", context.HttpContext.User.Identity.Name);
                     string dbtoken= (await cmd.ExecuteScalarAsync())?.ToString();
                     if (dbtoken != context.HttpContext.User.FindFirstValue("logintoken"))

@@ -1,0 +1,82 @@
+﻿/* 宠物预约页面专属样式 */
+.home-page.appoint-page {
+    min-height: 80vh;
+    padding: 30px 0;
+}
+
+/* 预约主卡片 */
+.appoint-card {
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background: #fff;
+}
+
+/* 卡片头部 */
+.appoint-header {
+    background-color: #4299e1;
+    color: white;
+    padding: 20px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* 卡片内容区 */
+.appoint-body {
+    padding: 30px;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        color: #333;
+    }
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+    .form-control:focus {
+        outline: none;
+        border-color: #4299e1;
+        box-shadow: 0 0 5px rgba(66, 153, 225, 0.3);
+    }
+
+/* 弹性布局 */
+.row {
+    display: flex;
+    gap: 20px;
+}
+
+.col {
+    flex: 1;
+}
+
+/* 提交按钮 */
+.submit-btn {
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 100%;
+    transition: 0.3s;
+}
+
+    .submit-btn:hover {
+        background-color: #3182ce;
+    }

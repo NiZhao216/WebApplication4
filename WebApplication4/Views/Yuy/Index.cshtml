@@ -1,0 +1,62 @@
+﻿@model dynamic
+@{
+    ViewBag.Title = "宠物预约挂号";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/css/yuyue.css" rel="stylesheet" />
+
+<div class="home-page appoint-page">
+    <div class="home-container">
+        <div class="appoint-card">
+            <div class="appoint-header">
+                <i class="fas fa-calendar-check"></i> 宠物在线预约挂号
+            </div>
+            <div class="appoint-body">
+                <form method="post">
+                    <!-- 主人姓名（自动读取登录用户） -->
+                    <div class="form-group">
+                        <label><i class="fas fa-user icon-blue"></i> 主人姓名</label>
+                        <input type="text" class="form-control" value="@User.Identity?.Name" readonly>
+                    </div>
+
+                    <!-- 联系电话 -->
+                    <div class="form-group">
+                        <label><i class="fas fa-phone icon-blue"></i> 联系电话</label>
+                        <input type="tel" class="form-control" placeholder="请输入手机号" required>
+                    </div>
+
+                    <!-- 预约项目 -->
+                    <div class="form-group">
+                        <label><i class="fas fa-clinic-medical icon-blue"></i> 预约项目</label>
+                        <select class="form-control" required>
+                            <option value="">请选择预约服务</option>
+                            <option value="疫苗接种">疫苗接种</option>
+                            <option value="体检">健康体检</option>
+                            <option value="疾病诊疗">疾病诊疗</option>
+                            <option value="美容护理">美容护理</option>
+                            <option value="驱虫">体内外驱虫</option>
+                        </select>
+                    </div>
+
+                    <!-- 预约时间 -->
+                    <div class="form-group">
+                        <label><i class="fas fa-clock icon-blue"></i> 预约时间</label>
+                        <input type="datetime-local" class="form-control" required>
+                    </div>
+
+                    <!-- 症状/需求描述 -->
+                    <div class="form-group">
+                        <label><i class="fas fa-comment-medical icon-blue"></i> 症状/需求描述</label>
+                        <textarea class="form-control" rows="4" placeholder="请描述宠物的症状或预约需求"></textarea>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> 提交预约
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

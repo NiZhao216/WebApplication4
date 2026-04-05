@@ -103,17 +103,17 @@ WHERE
                 int num= await cmd.ExecuteNonQueryAsync();
                 if (num > 0)
                 {
-                    if (User.Identity.Name != username)
+                    if (User.Identity!.Name != username)
                     {
                         // 1. 取出原来的权限角色
-                        string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                        string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value!;
 
                         // 2. 只用 用户名 + 权限 重新生成（干净！）
                         var newClaims = new List<Claim>
                          {
                               new Claim(ClaimTypes.Name, username),
                               new Claim(ClaimTypes.Role, role), // 权限还在！
-                              new Claim("logintoken", User.FindFirstValue("logintoken"))
+                              new Claim("logintoken", User.FindFirstValue("logintoken")!)
                           };
 
                         // 3. 重新登录
@@ -165,7 +165,7 @@ WHERE
                     }
                 }
             }
-            return null;
+            return null!;
         }
     }
 }

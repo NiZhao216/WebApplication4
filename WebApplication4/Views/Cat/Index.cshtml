@@ -1,0 +1,105 @@
+﻿@model WebApplication4.Models.Cats;
+@{
+    ViewBag.Title = "我的小猫档案";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/css/cat.css" rel="stylesheet" />
+
+<div class="page-wrapper">
+    <div class="container">
+        <div class="page-title">
+            <i class="fas fa-cat"></i> 我的小猫档案
+        </div>
+
+        <form method="post" action="Cat/SaveCat" class="pet-card">
+            <!-- 基础信息 -->
+            <div class="form-group">
+                <h4 class="section-title">
+                    <i class="fas fa-paw"></i> 基础信息
+                </h4>
+                <div class="grid-2">
+                    <div>
+                        <label class="form-label">猫咪昵称</label>
+                        <input name="CatName" value="@Model.CatName" class="form-input" placeholder="请输入猫咪名字">
+                    </div>
+                    <div>
+                        <label class="form-label">性别</label>
+                        <select name="Gender" class="form-input">
+                            <option value="公猫"@(Model.Gender=="公猫"?"selected":"")>公猫</option>
+                            <option value="母猫"@(Model.Gender == "母猫" ? "selected" : "")>母猫</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">年龄</label>
+                        <input name="Age" class="form-input" placeholder="如：1岁 / 3个月" type="text" value="@Model.Age">
+                    </div>
+                    <div>
+                        <label class="form-label">品种</label>
+                        <input name="Breed" class="form-input" placeholder="如：英短 / 美短 / 布偶" type="text" value="@Model.Breed">
+                    </div>
+                    <div>
+                        <label class="form-label">体重(kg)</label>
+                        <input name="Weight" class="form-input" type="text" value="@Model.Weight" placeholder="如：4.5">
+                    </div>
+                    <div>
+                        <label class="form-label">生日</label>
+                        <input name="Birthday" type="date" class="form-input" value="@(Model.Birthday.HasValue? Model.Birthday.Value.ToString("yyyy-MM-dd") : "")">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 健康档案 -->
+            <div class="form-group">
+                <h4 class="section-title section-blue">
+                    <i class="fas fa-file-medical"></i> 健康档案
+                </h4>
+                <div class="grid-1">
+                    <div>
+                        <label class="form-label">毛色/外观</label>
+                        <input name="CoatColor" class="form-input" type="text" value="@Model.CoatColor" placeholder="如：蓝白 / 纯黑 / 渐层">
+                    </div>
+                    <div>
+                        <label class="form-label">过敏史</label>
+                        <textarea name="Allergy" rows="2" class="form-input" placeholder="无 / 药物过敏 / 食物过敏">@Model.Allergy</textarea>
+                    </div>
+                    <div>
+                        <label class="form-label">既往病史</label>
+                        <textarea name="MedicalHistory" rows="3" class="form-input" placeholder="填写猫咪过往疾病、手术史等">@Model.MedicalHistory</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 疫苗&驱虫 -->
+            <div class="form-group">
+                <h4 class="section-title section-green">
+                    <i class="fas fa-shield-virus"></i> 疫苗&驱虫
+                </h4>
+                <div class="grid-2">
+                    <div>
+                        <label class="form-label">疫苗状态</label>
+                        <input name="VaccineStatus" class="form-input" placeholder="已完成 / 未完成 / 部分完成" type="text" value="@Model.VaccineStatus">
+                    </div>
+                    <div>
+                        <label class="form-label">下次疫苗时间</label>
+                        <input name="NextVaccineDate" type="date" value="@(Model.NextVaccineDate.HasValue? Model.NextVaccineDate.Value.ToString("yyyy-MM-dd") : "")" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">驱虫状态</label>
+                        <input name="DewormStatus" type="text" value="@Model.DewormStatus" class="form-input" placeholder="已驱虫 / 未驱虫">
+                    </div>
+                    <div>
+                        <label class="form-label">下次驱虫时间</label>
+                        <input name="NextDewormDate" type="date" value="@(Model.NextDewormDate.HasValue? Model.NextDewormDate.Value.ToString("yyyy-MM-dd") : "")" class="form-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 保存档案
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

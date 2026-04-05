@@ -56,7 +56,7 @@
         <!-- 用户名 -->
         <div class="form-item">
             <label>用户名</label>
-            <input type="text" name="username" value="@Model.username" />
+            <input type="text" name="username" value="@Model!.username" />
         </div>
 
         <!-- ID（只读） -->
@@ -88,8 +88,8 @@
             <label>性别</label>
             <select name="Sex">
                 <option value="未知" @(Model.sex == "未知" ? "selected" : "")>未知</option>
-                <option value="男" @(Model.sex == "男" ? "selected" : "")>男</option>
-                <option value="女" @(Model.sex == "女" ? "selected" : "")>女</option>
+                <option value="男" @(Model.sex == "男" ? "selected" :string.Empty)>男</option>
+                <option value="女" @(Model.sex == "女" ? "selected" : null)>女</option>
             </select>
         </div>
 
