@@ -6,16 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebApplication4.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebApplication4.Controllers.Login
 {
-    
-
-
     public class LoginController : Controller
     {
-        // 优化：从配置读取连接字符串（推荐，避免硬编码）
-        // 实际项目中建议从appsettings.json读取，这里先简化保留格式
         private readonly string _conStr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
 
         public IActionResult Index()
@@ -30,7 +26,6 @@ namespace WebApplication4.Controllers.Login
         [HttpPost]
         public async Task<IActionResult> Index(string username, string password)
         {
-            // 前置校验：空值过滤
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
                 ViewBag.ErrorMsg = "用户名或密码不能为空";
@@ -41,62 +36,85 @@ namespace WebApplication4.Controllers.Login
             {
                 using (var conn = new MySqlConnection(_conStr))
                 {
-                    await conn.OpenAsync(); // 异步打开连接（推荐）
-                    // 注意：生产环境必须用密码哈希比对，此处先保留逻辑，后续替换
-                    string sql = "SELECT role FROM userstable WHERE username = @username AND pwd = @password";
+                    await conn.OpenAsync();
+
+                    // 先按用户名取出存储的哈希和角色
+                    string sql = "SELECT pwd, role FROM userstable WHERE username = @username";
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@username", username);
-                        cmd.Parameters.AddWithValue("@password", password);
-                        object result = await cmd.ExecuteScalarAsync(); // 异步执行
-
-                        if (result != null)
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            string token=Guid.NewGuid().ToString();
-                            // 1. 构建身份认证Claims（添加更多用户信息）
-                            
-                               
-                            string sql2 = "UPDATE userstable SET token=@token WHERE username=@username";
-                            using (MySqlCommand tocmd = new MySqlCommand(sql2, conn))
+                            if (await reader.ReadAsync())
                             {
-                                tocmd.Parameters.AddWithValue("@token", token);
-                                tocmd.Parameters.AddWithValue("@username", username);
-                                int num = await tocmd.ExecuteNonQueryAsync();
-                                if (!(num > 0))
+                                string storedHash = reader["pwd"]?.ToString() ?? string.Empty;
+                                string role = reader["role"]?.ToString() ?? string.Empty;
+
+                                var hasher = new PasswordHasher<object>();
+                                var verifyResult = hasher.VerifyHashedPassword(null, storedHash, password);
+
+                                if (verifyResult == PasswordVerificationResult.Success || verifyResult == PasswordVerificationResult.SuccessRehashNeeded)
                                 {
+                                    // 在需要 rehash 时更新数据库（可选但推荐）
+                                    if (verifyResult == PasswordVerificationResult.SuccessRehashNeeded)
+                                    {
+                                        string newHash = hasher.HashPassword(null, password);
+                                        reader.Close();
+                                        string updSql = "UPDATE userstable SET pwd = @newHash WHERE username = @username";
+                                        using (var upcmd = new MySqlCommand(updSql, conn))
+                                        {
+                                            upcmd.Parameters.AddWithValue("@newHash", newHash);
+                                            upcmd.Parameters.AddWithValue("@username", username);
+                                            await upcmd.ExecuteNonQueryAsync();
+                                        }
+                                    }
+
+                                    // 生成 token 并更新数据库
+                                    string token = Guid.NewGuid().ToString();
+                                    // reader may still be open if not rehash; ensure closed before update
+                                    if (!reader.IsClosed) reader.Close();
+                                    string sql2 = "UPDATE userstable SET token=@token WHERE username=@username";
+                                    using (MySqlCommand tocmd = new MySqlCommand(sql2, conn))
+                                    {
+                                        tocmd.Parameters.AddWithValue("@token", token);
+                                        tocmd.Parameters.AddWithValue("@username", username);
+                                        int num = await tocmd.ExecuteNonQueryAsync();
+                                        if (!(num > 0))
+                                        {
+                                            return View();
+                                        }
+                                    }
+
+                                    var claims = new List<Claim>
+                                    {
+                                        new Claim(ClaimTypes.Name, username),
+                                        new Claim(ClaimTypes.Role, role),
+                                        new Claim("logintoken", token)
+                                    };
+
+                                    var identity = new ClaimsIdentity(claims, "Cookies");
+                                    await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
+
+                                    return RedirectToAction("Index","Home");
+                                }
+                                else
+                                {
+                                    ViewBag.ErrorMsg = "用户名或密码错误";
                                     return View();
                                 }
                             }
-                                var claims = new List<Claim>
+                            else
                             {
-                                new Claim(ClaimTypes.Name, username),
-                                new Claim(ClaimTypes.Role, result.ToString()),
-                                new Claim("logintoken",token)
-                            };
-
-                            // 2. 读取用户完整信息并添加到Claims（后续页面可直接获取）
-                           
-                           
-
-                            // 3. 生成登录Cookie
-                            var identity = new ClaimsIdentity(claims, "Cookies");
-                            await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
-
-                             return RedirectToAction("Index","Home");
-                        }
-                        else
-                        {
-                            ViewBag.ErrorMsg = "用户名或密码错误";
-                            return View();
+                                ViewBag.ErrorMsg = "用户名或密码错误";
+                                return View();
+                            }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                // 异常处理：记录日志（生产环境）+ 友好提示
                 ViewBag.ErrorMsg = "登录失败，请稍后重试";
-                // _logger.LogError(ex, "登录异常：{Username}", username); // 推荐添加日志
                 return View();
             }
         }
@@ -104,10 +122,8 @@ namespace WebApplication4.Controllers.Login
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            // 修正：指定认证方案，确保退出成功
             string? username = User.Identity?.Name;
 
-            // 2. 如果用户已登录，清空数据库中的 logintoken
             if (!string.IsNullOrEmpty(username))
             {
                 try
@@ -115,31 +131,27 @@ namespace WebApplication4.Controllers.Login
                     using (var conn = new MySqlConnection(_conStr))
                     {
                         await conn.OpenAsync();
-                        // SQL：把当前用户的token置空
                         string sql = "UPDATE userstable SET token = null WHERE username = @username";
                         using (var cmd = new MySqlCommand(sql, conn))
                         {
                             cmd.Parameters.AddWithValue("@username", username);
-                            await cmd.ExecuteNonQueryAsync(); // 异步执行
+                            await cmd.ExecuteNonQueryAsync();
                         }
                     }
                 }
                 catch
                 {
-                    // 数据库异常不影响退出，继续执行登出
                 }
             }
             await HttpContext.SignOutAsync("Cookies");
             return RedirectToAction("Index", "Login");
         }
 
-        // 抽离：读取用户完整信息的方法（复用+解耦）
         private async Task<User> GetUserInfoByUsername(string username)
         {
             using (var conn = new MySqlConnection(_conStr))
             {
                 await conn.OpenAsync();
-                // 修正：将不规范的"by"改为birthday（需同步修改数据库字段名）
                 string sql = "SELECT * FROM userstable WHERE username=@username";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
@@ -164,7 +176,7 @@ namespace WebApplication4.Controllers.Login
                     }
                 }
             }
-            return null;
+            return null!;
         }
     }
 }

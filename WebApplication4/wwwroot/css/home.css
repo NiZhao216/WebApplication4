@@ -1,0 +1,116 @@
+﻿/* 小猫看病 - 个人主页专用样式 */
+.home-page {
+    position: relative;
+    padding: 20px 0;
+}
+
+.home-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 欢迎卡片 */
+.welcome-card {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.welcome-desc {
+    color: #666;
+    font-size: 16px;
+}
+
+/* 功能卡片网格 */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+/* 功能卡片 */
+.function-card {
+    padding: 25px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+    .function-card h3 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+
+    .function-card p {
+        color: #666;
+        margin-bottom: 12px;
+    }
+
+/* 卡片链接 */
+.card-link {
+    display: inline-block;
+    margin-top: 4px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* 图标颜色 */
+.icon-pink {
+    color: #ff7d94;
+}
+
+.icon-blue {
+    color: #4fc0e8;
+}
+
+.icon-green {
+    color: #6ad897;
+}
+
+.icon-orange {
+    color: #ffb964;
+}
+
+.icon-purple {
+    color: #9c88ff;
+}
+
+.icon-red {
+    color: #f36868;
+}
+
+/* 链接颜色 */
+.link-pink {
+    color: #ff7d94;
+}
+
+.link-blue {
+    color: #4fc0e8;
+}
+
+.link-green {
+    color: #6ad897;
+}
+
+.link-orange {
+    color: #ffb964;
+}
+
+.link-purple {
+    color: #9c88ff;
+}
+
+.link-red {
+    color: #f36868;
+}
