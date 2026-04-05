@@ -11,4 +11,9 @@
     <PackageReference Include="MySqlConnector" Version="2.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Catlist\" />
+    <Folder Include="wwwroot\images\catavatar\" />
+  </ItemGroup>
+
 </Project>

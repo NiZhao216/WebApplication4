@@ -20,7 +20,7 @@ namespace WebApplication4.Controllers.Catlist
             {
                 await conn.OpenAsync();
                 // 不查ID，只查3个字段
-                string sql = "SELECT catname,gender,breed FROM userscat WHERE username=@Username";
+                string sql = "SELECT catname,gender,breed,avatar FROM userscat WHERE username=@Username";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@Username", username);
@@ -32,7 +32,9 @@ namespace WebApplication4.Controllers.Catlist
                             {
                                 CatName = reader.GetString(0),
                                 Gender = reader.GetString(1),
-                                Breed = reader.GetString(2)
+                                Breed = reader.GetString(2),
+                                avatar = reader.IsDBNull(3) ? "" : reader.GetString(3)
+
                             });
                         }
                     }
@@ -57,7 +59,7 @@ namespace WebApplication4.Controllers.Catlist
                 else
                     {
                     // 删除失败，返回错误信息
-                    TempData["ErrorMessage"] = "删除失败，请重试。";
+                    TempData["Msg"] = "删除失败，请重试。";
                     return RedirectToAction("Index");
                 }
             }

@@ -1,122 +1,166 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using WebApplication4.Models;
+using System.IO;
+
 namespace WebApplication4.Controllers.Cat
 {
     public class CatController : Controller
     {
+        // 1. 修正字段名：_ebHost → _webHost（与参数名统一，避免笔误）
+        private readonly IWebHostEnvironment _webHost;
+
+        // 2. 修正构造函数：private → public（关键！让DI容器能创建实例）
+        public CatController(IWebHostEnvironment webHost)
+        {
+            _webHost = webHost;
+        }
+
         private readonly string _conStr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
-        
+
+        #region 页面统一入口（新增/编辑都走这个）
+        // 列表跳转详情/编辑
         public IActionResult Index(string catName)
         {
-            Cats cat = GetCats(User.Identity?.Name ?? string.Empty, catName).Result;
+            // 根据猫名查询数据（编辑回填）
+            Cats cat = GetCatByName(User.Identity?.Name ?? string.Empty, catName).Result;
             return View(cat);
         }
+
+        // 新增空白页面
         public IActionResult InCreatedex()
         {
-            return View("~/Views/Cat/Index.cshtml",new Cats());
+            // 新增：Id 默认 0
+            return View("~/Views/Cat/Index.cshtml", new Cats());
         }
+        #endregion
 
+        #region 【核心】统一提交方法（自动区分新增/编辑）
         [HttpPost]
-        public async Task<IActionResult> SaveCat(Cats cat)
+        public async Task<IActionResult> SaveCat(Cats cat, IFormFile avatar, string oldavatar)
         {
-           
+            string username = User.Identity?.Name ?? string.Empty;
+            string filePath = string.Empty; // 默认头像路径
+            if (avatar != null && avatar.Length > 0) // 修正：Length >=0 → Length >0（避免空文件）
+            {
+                string uploadsFolder = Path.Combine(_webHost.WebRootPath, "images", "avatar");
+                // 确保文件夹存在（新增：避免上传时文件夹不存在报错）
+                Directory.CreateDirectory(uploadsFolder);
 
-            int id = 0;
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + avatar.FileName;
+                filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (FileStream s = new FileStream(filePath, FileMode.Create))
+                {
+                    await avatar.CopyToAsync(s);
+                }
+                filePath = "/images/avatar/" + Path.GetFileName(filePath); // 存储相对路径
+            }
+            else
+            {
+                filePath = oldavatar; // 保持原头像不变
+            }
 
-            // 2. 【优化】仅创建一次数据库连接（查询+增改共用，提升性能）
+            if (string.IsNullOrWhiteSpace(cat.CatName))
+            {
+                TempData["ERR"] = "猫咪名称不能为空，请输入后再保存！";
+                // 跳转回对应页面
+                return cat.Id > 0
+                    ? RedirectToAction("Index", new { catName = cat.CatName })
+                    : RedirectToAction("InCreatedex");
+            }
+
             using (var conn = new MySqlConnection(_conStr))
             {
                 await conn.OpenAsync();
 
-                // 第一步：查询猫咪旧名称对应的ID
-                string sqlid = "select id from userscat where username=@username and catname=@catname";
-                using (MySqlCommand cmd = new MySqlCommand(sqlid, conn))
+                // ====================== 1. 重名校验（通用）======================
+                bool exists = await CheckCatNameExists(conn, cat.Id, username, cat.CatName);
+                if (exists)
                 {
-                    cmd.Parameters.AddWithValue("@username", User.Identity.Name);
-                    cmd.Parameters.AddWithValue("@catname", cat.oldname ?? ""); // 空值兼容
-                    var result = await cmd.ExecuteScalarAsync();
-                    if (result != null && result != DBNull.Value)
-                    {
-                        id = Convert.ToInt32(result);
-                    }
+                    TempData["ERR"] = "猫咪名称已存在，请重新输入！";
+                    return cat.Id > 0
+                        ? RedirectToAction("Index", new { catName = cat.CatName })
+                        : RedirectToAction("InCreatedex");
                 }
 
-                // 第二步：新增/更新数据（ON DUPLICATE KEY 语法）
-                string sql = @"
-            INSERT INTO userscat (
-                id, catname, gender, age, breed, weight, birthday, coatcolor, 
-                allergy, medicalhistory, vaccinestatus, nextvaccinedate, 
-                dewormstatus, nextdewormdate, username
-            ) 
-            VALUES (
-                @id, @catname, @gender, @age, @breed, @weight, @birthday, @coatcolor,
-                @allergy, @medicalhistory, @vaccinestatus, @nextvaccinedate,
-                @dewormstatus, @nextdewormdate, @username
-            )
-            ON DUPLICATE KEY UPDATE 
-                catname = VALUES(catname),
-                gender = VALUES(gender),
-                age = VALUES(age),
-                breed = VALUES(breed),
-                weight = VALUES(weight),
-                birthday = VALUES(birthday),
-                coatcolor = VALUES(coatcolor),
-                allergy = VALUES(allergy),
-                medicalhistory = VALUES(medicalhistory),
-                vaccinestatus = VALUES(vaccinestatus),
-                nextvaccinedate = VALUES(nextvaccinedate),
-                dewormstatus = VALUES(dewormstatus),
-                nextdewormdate = VALUES(nextdewormdate);
-        ";
-
-                using (var cmd = new MySqlCommand(sql, conn))
+                // ====================== 2. 分支执行：新增 OR 编辑 ======================
+                if (cat.Id == 0)
                 {
-                    // 【核心修复】添加缺失的 @id 参数！原代码没有这个参数会直接报错
-                    cmd.Parameters.AddWithValue("@id", id);
+                    string insertSql = @"
+                        INSERT INTO userscat (
+                            catname, gender, age, breed, weight, birthday, coatcolor, 
+                            allergy, medicalhistory, vaccinestatus, nextvaccinedate, 
+                            dewormstatus, nextdewormdate, username,avatar
+                        ) 
+                        VALUES (
+                            @catname, @gender, @age, @breed, @weight, @birthday, @coatcolor,
+                            @allergy, @medicalhistory, @vaccinestatus, @nextvaccinedate,
+                            @dewormstatus, @nextdewormdate, @username,@avatar
+                        );";
 
-                    // 统一空值处理：字符串空值传空，日期空值传DBNull
-                    cmd.Parameters.AddWithValue("@catname", cat.CatName ?? "");
-                    cmd.Parameters.AddWithValue("@gender", cat.Gender ?? "");
-                    cmd.Parameters.AddWithValue("@age", cat.Age ?? "");
-                    cmd.Parameters.AddWithValue("@breed", cat.Breed ?? "");
-                    cmd.Parameters.AddWithValue("@weight", cat.Weight ?? "");
-                    cmd.Parameters.AddWithValue("@birthday", cat.Birthday ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@coatcolor", cat.CoatColor ?? "");
-                    cmd.Parameters.AddWithValue("@allergy", cat.Allergy ?? "");
-                    cmd.Parameters.AddWithValue("@medicalhistory", cat.MedicalHistory ?? "");
-                    cmd.Parameters.AddWithValue("@vaccinestatus", cat.VaccineStatus ?? "");
-                    cmd.Parameters.AddWithValue("@nextvaccinedate", cat.NextVaccineDate ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@dewormstatus", cat.DewormStatus ?? "");
-                    cmd.Parameters.AddWithValue("@nextdewormdate", cat.NextDewormDate ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@username", User.Identity.Name);
-
-                    int affectedRows = await cmd.ExecuteNonQueryAsync();
-                    if (affectedRows > 0)
+                    using (var cmd = new MySqlCommand(insertSql, conn))
                     {
-                        return RedirectToAction("Index", "Catlist");
+                        AddParameters(cmd, cat, username, filePath);
+                        await cmd.ExecuteNonQueryAsync();
                     }
+                    TempData["Msg"] = "新增猫咪成功！";
+                }
+                else
+                {
+                    string updateSql = @"
+                        UPDATE userscat SET
+                            catname = @catname,
+                            gender = @gender,
+                            age = @age,
+                            breed = @breed,
+                            weight = @weight,
+                            birthday = @birthday,
+                            coatcolor = @coatcolor,
+                            allergy = @allergy,
+                            medicalhistory = @medicalhistory,
+                            vaccinestatus = @vaccinestatus,
+                            nextvaccinedate = @nextvaccinedate,
+                            dewormstatus = @dewormstatus,
+                            nextdewormdate = @nextdewormdate,
+                            avatar=@avatar
+                        WHERE id = @id;";
+
+                    using (var cmd = new MySqlCommand(updateSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", cat.Id); // 主键Id
+                        AddParameters(cmd, cat, username, filePath);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                    TempData["Msg"] = "编辑猫咪成功！";
                 }
             }
 
-            return RedirectToAction("Index");
+            // 保存成功跳转到猫咪列表
+            return RedirectToAction("Index", "Catlist");
         }
-        private async Task<Cats> GetCats(string username,string catName)
+        #endregion
+
+        #region 工具方法（复用）
+        /// <summary>
+        /// 根据猫名查询（编辑回填用）
+        /// </summary>
+        private async Task<Cats> GetCatByName(string username, string catName)
         {
             using (var conn = new MySqlConnection(_conStr))
             {
                 await conn.OpenAsync();
-                string sql = "SELECT * FROM userscat WHERE username=@username and catname=@usercat";
+                string sql = "SELECT * FROM userscat WHERE username=@username AND catname=@catname";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@username", username);
-                    cmd.Parameters.AddWithValue("@usercat", catName);
+                    cmd.Parameters.AddWithValue("@catname", catName);
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
                         {
                             return new Cats
                             {
+                                Id = reader.GetInt32("id"),
                                 CatName = reader["catname"]?.ToString() ?? "",
                                 Gender = reader["gender"]?.ToString() ?? "",
                                 Age = reader["age"]?.ToString() ?? "",
@@ -127,20 +171,60 @@ namespace WebApplication4.Controllers.Cat
                                 Allergy = reader["allergy"]?.ToString() ?? "",
                                 MedicalHistory = reader["medicalhistory"]?.ToString() ?? "",
                                 VaccineStatus = reader["vaccinestatus"]?.ToString() ?? "",
-                                NextDewormDate = reader["nextdewormdate"] as DateTime?,
+                                NextVaccineDate = reader["nextvaccinedate"] as DateTime?,
                                 DewormStatus = reader["dewormstatus"]?.ToString() ?? "",
-                                NextVaccineDate = reader["nextvaccinedate"] as DateTime?
+                                NextDewormDate = reader["nextdewormdate"] as DateTime?,
+                                avatar = reader["avatar"]?.ToString() ?? ""
                             };
-
-                        }
-                        else
-                        {
-                            return new Cats();
                         }
                     }
-
                 }
             }
+            return new Cats();
         }
+
+        /// <summary>
+        /// 校验猫咪重名
+        /// </summary>
+        private async Task<bool> CheckCatNameExists(MySqlConnection conn, int catId, string username, string catName)
+        {
+            string sql = catId == 0
+                ? "SELECT COUNT(*) FROM userscat WHERE username=@username AND catname=@catname"
+                : "SELECT COUNT(*) FROM userscat WHERE username=@username AND catname=@catname AND id!=@id";
+
+            using (var cmd = new MySqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@username", username);
+                cmd.Parameters.AddWithValue("@catname", catName);
+                if (catId > 0) cmd.Parameters.AddWithValue("@id", catId);
+
+                int count = Convert.ToInt32(await cmd.ExecuteScalarAsync());
+                return count > 0;
+            }
+        }
+
+        /// <summary>
+        /// 统一参数封装
+        /// </summary>
+        private void AddParameters(MySqlCommand cmd, Cats cat, string username, string avatar)
+        {
+            cmd.Parameters.AddWithValue("@catname", cat.CatName ?? "");
+            cmd.Parameters.AddWithValue("@gender", cat.Gender ?? "");
+            cmd.Parameters.AddWithValue("@age", cat.Age ?? "");
+            cmd.Parameters.AddWithValue("@breed", cat.Breed ?? "");
+            cmd.Parameters.AddWithValue("@weight", cat.Weight ?? "");
+            cmd.Parameters.AddWithValue("@birthday", cat.Birthday ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@coatcolor", cat.CoatColor ?? "");
+            cmd.Parameters.AddWithValue("@allergy", cat.Allergy ?? "");
+            cmd.Parameters.AddWithValue("@medicalhistory", cat.MedicalHistory ?? "");
+            cmd.Parameters.AddWithValue("@vaccinestatus", cat.VaccineStatus ?? "");
+            cmd.Parameters.AddWithValue("@nextvaccinedate", cat.NextVaccineDate ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@dewormstatus", cat.DewormStatus ?? "");
+            cmd.Parameters.AddWithValue("@nextdewormdate", cat.NextDewormDate ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@username", username);
+            // 3. 修正：@avatar, → @avatar（去掉多余的逗号）
+            cmd.Parameters.AddWithValue("@avatar", avatar);
+        }
+        #endregion
     }
 }
