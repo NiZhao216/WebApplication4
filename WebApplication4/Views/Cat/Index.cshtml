@@ -6,18 +6,50 @@
 
 <link href="~/css/cat.css" rel="stylesheet" />
 
+<script type="text/javascript">
+    window.onload=function(){
+        var message = "@Html.Raw(TempData["ERR"])";
+        if(message!="")
+        alert(message);
+    };
+
+    // 头像预览功能（完全保留）
+    function previewAvatar(s)
+    {
+        if(s.files&&s.files[0]){
+            var reder = new FileReader();
+            reder.onload= function(e)
+            {
+                document.getElementById("avatar").src = e.target.result;
+            }
+            reder.readAsDataURL(s.files[0]);
+        }
+    }
+</script>
 <div class="page-wrapper">
     <div class="container">
         <div class="page-title">
             <i class="fas fa-cat"></i> 我的小猫档案
         </div>
 
-        <form method="post" action="/Cat/SaveCat" class="pet-card">
+        <form method="post" action="/Cat/SaveCat" class="pet-card" enctype="multipart/form-data">
+            <!-- ✅ 核心修复：猫咪ID隐藏域（解决编辑变新建） -->
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="oldavatar" value="@Model.avatar" />
+
             <!-- 基础信息 -->
             <div class="form-group">
                 <h4 class="section-title">
                     <i class="fas fa-paw"></i> 基础信息
                 </h4>
+                <div class="form-item avatar-area">
+                    <label>头像</label>
+                    <img id="avatar"
+                         src="@(string.IsNullOrEmpty(Model?.avatar) ? "/images/catavatar/default.png" : Model.avatar)"
+                         alt="猫咪头像">
+                    <input type="file" id="avatarInput" name="avatar" onchange="previewAvatar(this)">
+                    <label for="avatarInput">📸 选择头像</label>
+                </div>
                 <div class="grid-2">
                     <input type="hidden" class="old-cat-name" name="oldname" value="@Model.CatName" />
                     <div>
@@ -27,8 +59,8 @@
                     <div>
                         <label class="form-label">性别</label>
                         <select name="Gender" class="form-input">
-                            <option value="公猫"@(Model.Gender=="公猫"?"selected":"")>公猫</option>
-                            <option value="母猫"@(Model.Gender == "母猫" ? "selected" : "")>母猫</option>
+                            <option value="公猫" @(Model.Gender == "公猫" ? "selected" : "")>公猫</option>
+                            <option value="母猫" @(Model.Gender == "母猫" ? "selected" : "")>母猫</option>
                         </select>
                     </div>
                     <div>

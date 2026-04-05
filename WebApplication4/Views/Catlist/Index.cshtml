@@ -5,6 +5,13 @@
 }
 <link href="~/css/kitten-cat-list.css" rel="stylesheet" />
 
+<script type="text/javascript">
+    window.onload=function(){
+        var message = "@Html.Raw(TempData["Msg"])";
+        if(message!="")
+        alert(message);
+    };
+</script>
 <div class="cat-list-wrapper">
     <div class="cat-list-container">
         <div class="cat-list-title">
@@ -38,9 +45,22 @@
         else
         {
             <div class="cat-table">
+                <!-- ✅ 新增：表头标题行（与列表列一一对应） -->
+                <div class="cat-row cat-header">
+                    <div class="nav-user"><strong>头像</strong></div>
+                    <div class="cat-info"><strong>猫咪昵称</strong></div>
+                    <div class="cat-info"><strong>性别</strong></div>
+                    <div class="cat-info"><strong>品种</strong></div>
+                    <div class="cat-info"><strong>操作</strong></div> <!-- 操作列标题 -->
+                </div>
+
                 @foreach (var cat in Model)
                 {
                     <div class="cat-row">
+                        <div class="nav-user">
+                            <img src="@(string.IsNullOrEmpty(cat?.avatar) ? "/images/catavatar/default.png" : cat.avatar)"
+                                 class="nav-avatar" alt="用户头像" onclick="window.location.href='@Url.Action("Index", "Cat", new { catName = cat.CatName })'">
+                        </div>
                         <div class="cat-info">@cat.CatName</div>
                         <div class="cat-info">@cat.Gender</div>
                         <div class="cat-info">@cat.Breed</div>
