@@ -1,0 +1,136 @@
+@model WebApplication4.Models.Doctors
+@{
+    ViewBag.Title = "医生主页";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+    ViewBag.DoctorName = Model?.DoctorName;
+    ViewBag.Department = Model?.Department;
+    ViewBag.Avatar = Model?.Avatar;
+}
+<link href="~/css/doctor-home.css" rel="stylesheet" />
+
+<div class="doctor-home-page">
+    <!-- 统计卡片区域 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon stat-blue">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">12</div>
+                <div class="stat-label">今日预约</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-green">
+                <i class="fas fa-user-injured"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">8</div>
+                <div class="stat-label">待诊患者</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-orange">
+                <i class="fas fa-file-medical"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">5</div>
+                <div class="stat-label">待写病历</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-purple">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">3</div>
+                <div class="stat-label">待处理消息</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="doctor-container">
+        <!-- 医生基本信息卡片 -->
+        <div class="doctor-profile-card">
+            <div class="doctor-avatar-section">
+                <img src="@(string.IsNullOrEmpty(Model?.Avatar) ? "/images/avatar/default.png" : Model.Avatar)" 
+                     alt="医生头像" class="doctor-avatar">
+                <div class="doctor-status @(Model?.Status == "在职" ? "status-active" : "status-inactive")">
+                    @Model?.Status
+                </div>
+            </div>
+            <div class="doctor-info-section">
+                <h1 class="doctor-name">@Model?.DoctorName</h1>
+                <div class="doctor-title">@Model?.Title | @Model?.Department</div>
+                <div class="doctor-motto">
+                    <i class="fas fa-quote-left icon-pink"></i>
+                    @Model?.Motto
+                    <i class="fas fa-quote-right icon-pink"></i>
+                </div>
+                <div class="doctor-contact">
+                    <div class="contact-item">
+                        <i class="fas fa-phone icon-blue"></i>
+                        <span>@Model?.Phone</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope icon-purple"></i>
+                        <span>@Model?.Email</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 医生详细信息区域 -->
+        <div class="doctor-details-grid">
+            <!-- 个人简介 -->
+            <div class="detail-card">
+                <h3><i class="fas fa-user-md icon-pink"></i> 个人简介</h3>
+                <p>@Model?.Introduction</p>
+            </div>
+
+            <!-- 擅长领域 -->
+            <div class="detail-card">
+                <h3><i class="fas fa-star icon-orange"></i> 擅长领域</h3>
+                <p>@Model?.Specialty</p>
+            </div>
+
+            <!-- 执业信息 -->
+            <div class="detail-card">
+                <h3><i class="fas fa-id-card icon-blue"></i> 执业信息</h3>
+                <div class="license-info">
+                    <div class="info-row">
+                        <span class="info-label">执业证号：</span>
+                        <span class="info-value">@Model?.LicenseNo</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">性别：</span>
+                        <span class="info-value">@Model?.Gender</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">入职日期：</span>
+                        <span class="info-value">@Model?.HireDate?.ToString("yyyy-MM-dd")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快捷操作区域 -->
+        <div class="quick-actions">
+            <div class="action-card">
+                <h3><i class="fas fa-calendar-plus"></i> 新增预约</h3>
+                <p>为患者添加新的预约记录</p>
+                <a href="#" class="action-btn">立即添加</a>
+            </div>
+            <div class="action-card">
+                <h3><i class="fas fa-edit"></i> 编辑病历</h3>
+                <p>查看和编辑患者病历信息</p>
+                <a href="#" class="action-btn">开始编辑</a>
+            </div>
+            <div class="action-card">
+                <h3><i class="fas fa-user-plus"></i> 添加患者</h3>
+                <p>录入新的患者信息</p>
+                <a href="#" class="action-btn">添加患者</a>
+            </div>
+        </div>
+    </div>
+</div>

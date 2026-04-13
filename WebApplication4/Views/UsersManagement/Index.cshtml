@@ -1,0 +1,79 @@
+@model List<WebApplication4.Models.User>
+@{
+    // 获取当前页码
+    var pageQuery = Context.Request.Query["pageIndex"].FirstOrDefault() ?? "1";
+    int currentPage = int.Parse(pageQuery);
+    ViewData["Title"] = "用户管理";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- 主内容区（完全匹配你的CSS样式） -->
+<div class="admin-content">
+    <div class="admin-header">
+        <h1>用户管理</h1>
+        <div class="admin-user-info">
+            <span>当前登录：管理员</span>
+        </div>
+    </div>
+
+    <!-- 用户列表 -->
+    <div class="admin-users-list">
+        <h2>普通用户列表（已排除管理员）</h2>
+        <div class="users-table-container">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>用户ID</th>
+                        <th>用户名</th>
+                        <th>用户角色</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.id</td>
+                                <td>@user.username</td>
+                                <td>@user.role</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">编辑</button>
+                                    <button class="btn btn-sm btn-danger">删除</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">暂无用户数据</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            @* 上一页：使用 @Url.Action 生成链接 *@
+            @if (currentPage > 1)
+            {
+                <a href="@Url.Action("UsersF5", "UsersManagement", new { pageIndex = currentPage - 1 })" class="page-link">
+                    上一页
+                </a>
+            }
+            else
+            {
+                <span class="page-link" disabled>上一页</span>
+            }
+
+            <span>第 @currentPage 页</span>
+
+            @* 下一页：使用 @Url.Action 生成链接 *@
+            <a href="@Url.Action("UsersF5", "UsersManagement", new { pageIndex = currentPage + 1 })" class="page-link">
+                下一页
+            </a>
+        </div>
+    </div>
+</div>

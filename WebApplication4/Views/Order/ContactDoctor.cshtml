@@ -1,0 +1,73 @@
+@model WebApplication4.Models.Orders
+@{
+    ViewBag.Title = "联系医生";
+}
+
+<link href="~/css/order.css" rel="stylesheet" />
+
+<div class="order-page">
+    <div class="order-header">
+        <h2><i class="fas fa-comments"></i> 联系医生</h2>
+    </div>
+
+    <div class="order-card">
+        <div class="order-header-info">
+            <div class="order-id">订单号: @Model.Id</div>
+            <div class="order-status @GetStatusClass(Model.Status)">@Model.Status</div>
+        </div>
+
+        <div class="order-body">
+            <div class="order-info-row">
+                <div class="order-info-item">
+                    <span class="info-label"><i class="fas fa-cat"></i> 宠物名称:</span>
+                    <span class="info-value">@Model.CatName</span>
+                </div>
+                <div class="order-info-item">
+                    <span class="info-label"><i class="fas fa-user-md"></i> 医生:</span>
+                    <span class="info-value">@Model.DoctorName</span>
+                </div>
+            </div>
+
+            <div class="order-info-row">
+                <div class="order-info-item">
+                    <span class="info-label"><i class="fas fa-stethoscope"></i> 预约项目:</span>
+                    <span class="info-value">@Model.ServiceType</span>
+                </div>
+                <div class="order-info-item">
+                    <span class="info-label"><i class="fas fa-calendar-alt"></i> 预约时间:</span>
+                    <span class="info-value">@Model.AppointmentTime.ToString("yyyy-MM-dd HH:mm")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-body">
+            <h3><i class="fas fa-envelope"></i> 发送消息给医生</h3>
+            <form method="post" action="@Url.Action("SendMessage", "Order")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderId" value="@Model.Id" />
+                <div class="form-group">
+                    <label for="message">消息内容:</label>
+                    <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
+                </div>
+                <div class="order-footer">
+                    <button type="submit" class="btn btn-primary">发送消息</button>
+                    <a href="@Url.Action("Index", "Order")" class="btn btn-cancel">返回订单列表</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "待确认" => "status-pending",
+            "已确认" => "status-confirmed",
+            "已完成" => "status-completed",
+            "已取消" => "status-cancelled",
+            _ => ""
+        };
+    }
+}

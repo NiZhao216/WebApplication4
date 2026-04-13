@@ -1,0 +1,106 @@
+@model List<WebApplication4.Models.Orders>
+@{
+    ViewBag.Title = "我的订单";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/css/order.css" rel="stylesheet" />
+
+<div class="order-page">
+    <div class="order-header">
+        <h2><i class="fas fa-clipboard-list"></i> 我的预约订单</h2>
+    </div>
+        
+    @if (Model != null && Model.Count > 0)
+    {
+        @foreach (var order in Model)
+        {
+                    <div class="order-card">
+                        <div class="order-header-info">
+                            <div class="order-id">订单号: @order.Id</div>
+                            <div class="order-status @GetStatusClass(order.Status)">@order.Status</div>
+                        </div>
+                        
+                        <div class="order-body">
+                            <div class="order-info-row">
+                                <div class="order-info-item">
+                                    <span class="info-label"><i class="fas fa-cat"></i> 宠物名称:</span>
+                                    <span class="info-value">@order.CatName</span>
+                                </div>
+                                <div class="order-info-item">
+                                    <span class="info-label"><i class="fas fa-user-md"></i> 医生:</span>
+                                    <span class="info-value">@order.DoctorName</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-info-row">
+                                <div class="order-info-item">
+                                    <span class="info-label"><i class="fas fa-stethoscope"></i> 预约项目:</span>
+                                    <span class="info-value">@order.ServiceType</span>
+                                </div>
+                                <div class="order-info-item">
+                                    <span class="info-label"><i class="fas fa-calendar-alt"></i> 预约时间:</span>
+                                    <span class="info-value">@order.AppointmentTime.ToString("yyyy-MM-dd HH:mm")</span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-info-row">
+                                <div class="order-info-item">
+                                    <span class="info-label"><i class="fas fa-phone"></i> 联系电话:</span>
+                                    <span class="info-value">@order.Phone</span>
+                                </div>
+                                <div class="order-info-item">
+                                    <span class="info-label"><i class="fas fa-clock"></i> 下单时间:</span>
+                                    <span class="info-value">@order.CreateTime.ToString("yyyy-MM-dd HH:mm")</span>
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(order.Description))
+                            {
+                                <div class="order-description">
+                                    <span class="info-label"><i class="fas fa-comment-medical"></i> 症状/需求描述:</span>
+                                    <p class="info-value">@order.Description</p>
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="order-footer">
+                            @if (order.Status == "待确认" || order.Status == "已确认")
+                            {
+                                <a href="@Url.Action("CancelOrder", "Order", new { orderId = order.Id })" class="btn btn-cancel" style="text-decoration: none !important;">取消预约</a>
+                            }
+                        
+                                <a href="@Url.Action("ContactDoctor", "Order", new { orderId = order.Id })" class="btn btn-cancel" style="text-decoration: none !important;">联系医生</a>
+                       
+                                <a href="@Url.Action("EditOrder", "Order", new { orderId = order.Id })" class="btn btn-cancel" style="text-decoration: none !important;">修改订单</a>
+                       
+                                <a href="@Url.Action("AfterSales", "Order", new { orderId = order.Id })" class="btn btn-cancel" style="text-decoration: none !important;">售后服务</a>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="order-card">
+                    <div class="order-body" style="text-align: center; padding: 50px 20px;">
+                        <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 20px; color: #dee2e6;"></i>
+                        <p style="font-size: 1.2rem; margin-bottom: 30px; color: #6c757d;">您还没有任何预约订单</p>
+                        <a href="@Url.Action("Index", "Yuy")" class="btn btn-primary" style="text-decoration: none !important;">立即预约</a>
+                    </div>
+                </div>
+            }
+</div>
+
+@functions {
+    public string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "待确认" => "status-pending",
+            "已确认" => "status-confirmed",
+            "已完成" => "status-completed",
+            "已取消" => "status-cancelled",
+            _ => ""
+        };
+    }
+}

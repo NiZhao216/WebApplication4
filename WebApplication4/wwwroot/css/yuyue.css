@@ -80,3 +80,65 @@
     .submit-btn:hover {
         background-color: #3182ce;
     }
+
+/* 宠物选择区域 */
+.cat-select-group {
+    margin-bottom: 25px;
+}
+
+.cat-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cat-select {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 添加宠物链接 */
+.add-cat-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    color: #4299e1;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.add-cat-link:hover {
+    background-color: #e9ecef;
+    border-color: #4299e1;
+    color: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(66, 153, 225, 0.2);
+}
+
+/* 消息提示样式 */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}

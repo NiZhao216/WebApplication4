@@ -1,0 +1,97 @@
+
+@{
+    ViewData["Title"] = "管理员控制台";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-content">
+    <div class="admin-header">
+        <h1>欢迎回来，管理员</h1>
+    </div>
+
+    <!-- 仪表盘统计卡片 -->
+    <div class="admin-dashboard">
+        <div class="dashboard-card">
+            <div class="card-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="card-content">
+                <h3>用户总数</h3>
+                <p class="card-number">128</p>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="card-content">
+                <h3>医生总数</h3>
+                <p class="card-number">15</p>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="card-content">
+                <h3>今日预约</h3>
+                <p class="card-number">23</p>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">
+                <i class="fas fa-paw"></i>
+            </div>
+            <div class="card-content">
+                <h3>宠物总数</h3>
+                <p class="card-number">256</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近活动列表 -->
+    <div class="admin-recent-activities">
+        <h2>最近活动</h2>
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="activity-details">
+                    <p>新用户注册</p>
+                    <span>5分钟前</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <div class="activity-details">
+                    <p>新预约创建</p>
+                    <span>15分钟前</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="activity-details">
+                    <p>医生信息更新</p>
+                    <span>30分钟前</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <div class="activity-details">
+                    <p>新宠物档案创建</p>
+                    <span>45分钟前</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿@model dynamic
+﻿@model (List<WebApplication4.Models.Cats>,List<WebApplication4.Models.Doctors>)
 @{
     ViewBag.Title = "宠物预约挂号";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -13,23 +13,63 @@
                 <i class="fas fa-calendar-check"></i> 宠物在线预约挂号
             </div>
             <div class="appoint-body">
-                <form method="post">
+                <!-- 显示成功或错误消息 -->
+                @if (!string.IsNullOrEmpty(TempData["Success"] as string))
+                {
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> @TempData["Success"]
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(TempData["Error"] as string))
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+                    </div>
+                }
+
+                <form method="post" action="@Url.Action(action: "Createorder", controller: "Yuy")" onsubmit="return updateCatName();" class="appoint-form">
+                    @Html.AntiForgeryToken()
                     <!-- 主人姓名（自动读取登录用户） -->
                     <div class="form-group">
                         <label><i class="fas fa-user icon-blue"></i> 主人姓名</label>
-                        <input type="text" class="form-control" value="@User.Identity?.Name" readonly>
+                        <input type="text" name="UserName" class="form-control" value="@User.Identity?.Name" readonly>
+                    </div>
+                    <input type="hidden" id="Doctorjs" name="DoctorName"/> 
+                    <input type="hidden" id="Catjs" name="CatName" />
+                    <!-- 选择宠物 -->
+                    <div class="form-group cat-select-group">
+                        <label><i class="fas fa-cat icon-blue"></i> 选择宠物</label>
+                        <div class="cat-select-wrapper">
+                            <select  id="CatId" class="form-control cat-select" required>
+                                <option value="">请选择宠物</option>
+                                @if (Model.Item1 != null && Model.Item1.Count > 0)
+                                {
+                                    @foreach (var cat in Model.Item1)
+                                    {
+                                        <option value="@cat.Id">@cat.CatName</option>
+                                    }
+                                }
+                            </select>
+                            @if(Model.Item1 == null)
+                            {
+                                <a href="@Url.Action(action: "InCreatedex", controller: "Cat")" class="add-cat-link">
+                                <i class="fas fa-plus-circle"></i> 添加宠物
+                                </a>
+                            }
+                            
+                        </div>
                     </div>
 
                     <!-- 联系电话 -->
                     <div class="form-group">
                         <label><i class="fas fa-phone icon-blue"></i> 联系电话</label>
-                        <input type="tel" class="form-control" placeholder="请输入手机号" required>
+                        <input type="tel" name="Phone" class="form-control" placeholder="请输入手机号" required>
                     </div>
 
                     <!-- 预约项目 -->
                     <div class="form-group">
                         <label><i class="fas fa-clinic-medical icon-blue"></i> 预约项目</label>
-                        <select class="form-control" required>
+                        <select name="ServiceType" class="form-control" required>
                             <option value="">请选择预约服务</option>
                             <option value="疫苗接种">疫苗接种</option>
                             <option value="体检">健康体检</option>
@@ -42,13 +82,33 @@
                     <!-- 预约时间 -->
                     <div class="form-group">
                         <label><i class="fas fa-clock icon-blue"></i> 预约时间</label>
-                        <input type="datetime-local" class="form-control" required>
+                        <input type="datetime-local" name="AppointmentTime" class="form-control" required>
                     </div>
 
                     <!-- 症状/需求描述 -->
                     <div class="form-group">
                         <label><i class="fas fa-comment-medical icon-blue"></i> 症状/需求描述</label>
-                        <textarea class="form-control" rows="4" placeholder="请描述宠物的症状或预约需求"></textarea>
+                        <textarea name="Description" class="form-control" rows="4" placeholder="请描述宠物的症状或预约需求"></textarea>
+                    </div>
+                    <!-- 选择医生 -->
+                     <div class="form-group cat-select-group">
+                        <label><i class="fas fa-cat icon-blue"></i> 选择医生</label>
+                        <div class="cat-select-wrapper">
+                            <select id="DoctorId" class="form-control cat-select" required>
+                                <option value="">请选择医生</option>
+                                @if (Model.Item2 != null && Model.Item2.Count > 0)
+                                {
+                                    @foreach (var doctors in Model.Item2)
+                                    {
+                                        <option value="@doctors.DoctorId" >@doctors.DoctorName</option>
+                                    }
+                                }
+                            </select>
+                            @if(Model.Item2 == null)
+                            {
+                               <p>暂无医生</p>
+                            }                       
+                        </div>
                     </div>
 
                     <!-- 提交按钮 -->
@@ -60,3 +120,23 @@
         </div>
     </div>
 </div>
+<script>
+    // 当选择宠物时，将宠物名称存储到隐藏字段中
+  function updateCatName() {
+    var catSelect = document.getElementById("CatId");
+    var catNameInput = document.getElementById("Catjs");
+    
+    // 获取选中的宠物名称
+    var selectedOption = catSelect.options[catSelect.selectedIndex];
+    catNameInput.value = selectedOption.text;
+
+    var doctorSelect = document.getElementById("DoctorId");
+    var doctorNameInput = document.getElementById("Doctorjs");
+
+    var selectedDoctorOption = doctorSelect.options[doctorSelect.selectedIndex];
+    doctorNameInput.value = selectedDoctorOption.text;
+    
+    return true;
+
+    }
+</script>

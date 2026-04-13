@@ -5,8 +5,14 @@ using System.IO;
 
 namespace WebApplication4.Controllers.Cat
 {
+    /// <summary>
+    /// 猫咪控制器，处理猫咪相关的页面展示和数据操作
+    /// </summary>
     public class CatController : Controller
     {
+        /// <summary>
+        /// Web主机环境服务，用于获取网站根目录路径
+        /// </summary>
         // 1. 修正字段名：_ebHost → _webHost（与参数名统一，避免笔误）
         private readonly IWebHostEnvironment _webHost;
 
@@ -16,14 +22,15 @@ namespace WebApplication4.Controllers.Cat
             _webHost = webHost;
         }
 
+        // 数据库连接字符串，用于连接MySQL数据库
         private readonly string _conStr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
 
         #region 页面统一入口（新增/编辑都走这个）
         // 列表跳转详情/编辑
-        public IActionResult Index(string catName)
+        public async Task<IActionResult> Index(string catName)
         {
             // 根据猫名查询数据（编辑回填）
-            Cats cat = GetCatByName(User.Identity?.Name ?? string.Empty, catName).Result;
+            Cats cat =await GetCatByName(User.Identity?.Name ?? string.Empty, catName);
             return View(cat);
         }
 
@@ -53,7 +60,7 @@ namespace WebApplication4.Controllers.Cat
                 {
                     await avatar.CopyToAsync(s);
                 }
-                filePath = "/images/avatar/" + Path.GetFileName(filePath); // 存储相对路径
+                filePath = "/images/catavatar/" + Path.GetFileName(filePath); // 存储相对路径
             }
             else
             {

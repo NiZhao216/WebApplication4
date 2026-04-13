@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - 医生工作台</title>
+
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入医生专用样式 -->
+    <link rel="stylesheet" href="~/css/doctor-layout.css" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="doctor-wrapper">
+        <!-- 侧边栏 -->
+        <aside class="doctor-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h2>医生工作台</h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/Doctor/Index" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-home"></i>
+                    <span>首页</span>
+                </a>
+                <a href="/Doctor/Appointments" class="nav-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>预约管理</span>
+                </a>
+                <a href="/Doctor/Patients" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>患者管理</span>
+                </a>
+                <a href="/Doctor/MedicalRecords" class="nav-item">
+                    <i class="fas fa-file-medical"></i>
+                    <span>病历管理</span>
+                </a>
+                <a href="/Doctor/Profile" class="nav-item">
+                    <i class="fas fa-user-circle"></i>
+                    <span>个人资料</span>
+                </a>
+                <a href="/Doctor/Settings" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <form method="post" action="/Doctor/Logout" class="logout-form">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>退出登录</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <div class="doctor-main">
+            <!-- 顶部导航栏 -->
+            <header class="doctor-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>@ViewBag.Title</h1>
+                </div>
+
+                <div class="header-right">
+                    <div class="doctor-info">
+                        <img src="@(string.IsNullOrEmpty(ViewBag.Avatar as string) ? "/images/avatar/default.png" : ViewBag.Avatar)" 
+                             alt="医生头像" class="header-avatar">
+                        <div class="doctor-details">
+                            <span class="doctor-name">@ViewBag.DoctorName</span>
+                            <span class="doctor-title">@ViewBag.Department</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="doctor-content">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        // 侧边栏切换
+        document.getElementById('menuToggle')?.addEventListener('click', function() {
+            document.querySelector('.doctor-sidebar').classList.toggle('collapsed');
+            document.querySelector('.doctor-main').classList.toggle('expanded');
+        });
+    </script>
+</body>
+</html>
+<script>
+    
+</script>
