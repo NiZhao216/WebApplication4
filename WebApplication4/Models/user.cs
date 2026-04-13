@@ -1,5 +1,8 @@
 ﻿namespace WebApplication4.Models
 {
+    /// <summary>
+    /// 用户类，用于存储用户相关信息
+    /// </summary>
     public class User
     {
         // 原有字段
@@ -17,6 +20,7 @@
         public string? address { get; set; }
 
         public string? avatar { get; set; }
+        public string? role { get; set; }
 
 
     }

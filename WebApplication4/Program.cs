@@ -2,14 +2,23 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 namespace WebApplication4
 {
+    /// <summary>
+    /// 程序的主入口类
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// 程序的主入口方法
+        /// </summary>
+        /// <param name="args">命令行参数</param>
         public static void Main(string[] args)
         {
+            // 创建 WebApplication 构建器
             var builder = WebApplication.CreateBuilder(args);
 
             // 1. 添加控制器与视图服务（默认已有）
             builder.Services.AddControllersWithViews();
+            // 配置全局过滤器，为所有请求添加登录令牌过滤器
             builder.Services.AddControllersWithViews(options =>
             {
                 // 👇 这一行就是【全局注册】！所有请求自动拦截

@@ -24,10 +24,10 @@ namespace WebApplication4.Controllers.UserCenter
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             
-            User currentUser = GetUserInfoByUsername(User.Identity?.Name ?? string.Empty).Result;
+            User currentUser = await  GetUserInfoByUsername(User.Identity?.Name ?? string.Empty);
 
 
             return View(currentUser);

@@ -113,6 +113,15 @@ main {
     margin: 0 auto;
 }
 
+/* 全局超链接样式 */
+a, a:-webkit-any-link {
+    text-decoration: none !important;
+}
+
+a:hover, a:focus, a:active, a:visited, a:hover:-webkit-any-link, a:focus:-webkit-any-link, a:active:-webkit-any-link, a:visited:-webkit-any-link {
+    text-decoration: none !important;
+}
+
 /* 页脚 */
 footer {
     background-color: #FFD1DC;

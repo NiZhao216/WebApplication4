@@ -2,9 +2,15 @@
 
 namespace WebApplication4.Models
 {
+    /// <summary>
+    /// Cats类，用于存储猫咪的基本信息
+    /// </summary>
     public class Cats
     {
-        public int Id { get; set; }
+        /// <summary>
+        /// 猫咪的唯一标识符
+        /// </summary>
+        public int Id { get; set; } 
         // 猫咪昵称
         public string CatName { get; set; } = string.Empty;
         // 性别

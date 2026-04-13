@@ -1,0 +1,131 @@
+@model List<WebApplication4.Models.Orders>
+@{
+    // 获取当前页码
+    var pageQuery = Context.Request.Query["pageIndex"].FirstOrDefault() ?? "1";
+    int currentPage = int.Parse(pageQuery);
+    ViewData["Title"] = "预约订单管理";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- 主内容区（完全匹配你的CSS样式） -->
+<div class="admin-content">
+    <div class="admin-header">
+        <h1>预约订单管理</h1>
+        <div class="admin-user-info">
+            <span>当前登录：管理员</span>
+        </div>
+    </div>
+
+    <!-- 订单列表 -->
+    <div class="admin-users-list">
+        <h2>预约订单列表</h2>
+        <div class="users-table-container">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>用户名</th>
+                        <th>猫咪</th>
+                        <th>服务类型</th>
+                        <th>预约时间</th>
+                        <th>医生</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Count > 0)
+                    {
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td>@order.Id</td>
+                                <td>@order.UserName</td>
+                                <td>@order.CatName</td>
+                                <td>@order.ServiceType</td>
+                                <td>@order.AppointmentTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@order.DoctorName</td>
+                                <td>@order.Status</td>
+                                <td>@order.CreateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>
+                                    @if (order.Status == "待确认")
+                                    {
+                                        <button class="btn btn-sm btn-primary" onclick="updateOrderStatus(@order.Id, '已确认')">确认</button>
+                                    }
+                                    @if (order.Status == "已确认")
+                                    {
+                                        <button class="btn btn-sm btn-primary" onclick="updateOrderStatus(@order.Id, '已完成')">完成</button>
+                                    }
+                                    @if (order.Status == "待确认" || order.Status == "已确认")
+                                    {
+                                        <button class="btn btn-sm btn-danger" onclick="updateOrderStatus(@order.Id, '已取消')">取消</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center">暂无订单数据</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            @* 上一页：使用 @Url.Action 生成链接 *@
+            @if (currentPage > 1)
+            {
+                <a href="@Url.Action("Index", "YuyManagement", new { pageIndex = currentPage - 1 })" class="page-link">
+                    上一页
+                </a>
+            }
+            else
+            {
+                <span class="page-link" disabled>上一页</span>
+            }
+
+            <span>第 @currentPage 页</span>
+
+            @* 下一页：使用 @Url.Action 生成链接 *@
+            <a href="@Url.Action("Index", "YuyManagement", new { pageIndex = currentPage + 1 })" class="page-link">
+                下一页
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateOrderStatus(id, status) {
+            if (confirm('确定要将订单状态更改为: ' + status + ' 吗？')) {
+                fetch('/YuyManagement/UpdateOrderStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        status: status
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('订单状态更新成功！');
+                        location.reload();
+                    } else {
+                        alert('订单状态更新失败，请重试！');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('订单状态更新失败，请重试！');
+                });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,73 @@
+
+@using WebApplication4
+@using MySqlConnector;
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 管理员控制台</title>
+
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入管理员样式 -->
+    <link rel="stylesheet" href="~/css/admin/admin-layout.css" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="admin-sidebar">
+            <div class="admin-logo">
+                <h2>宠物医院管理系统</h2>
+                <p>管理员控制台</p>
+            </div>
+            <ul class="admin-nav">
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Admin")">
+                        <i class="fas fa-tachometer-alt"></i> <span>仪表盘</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "UsersManagement" ? "active" : "")">
+                    <a href="@Url.Action("Index","UsersManagement")">
+                        <i class="fas fa-users"></i> <span>用户管理</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Doctors" ? "active" : "")">
+                    <a href="@Url.Action("Index","DoctorsManagement")">
+                        <i class="fas fa-user-md"></i> <span>医生管理</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Appointments" ? "active" : "")">
+                    <a href="@Url.Action("Index","YuyManagement")">
+                        <i class="fas fa-calendar-check"></i> <span>预约管理</span>
+                    </a>
+                </li>
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")">
+                    <a asp-controller="Admin" asp-action="Settings">
+                        <i class="fas fa-cog"></i> <span>系统设置</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="admin-content">
+            <div class="admin-header">
+                <h1>@ViewData["Title"]</h1>
+                <div class="admin-user-info">
+                    <span>@User.Identity?.Name</span>
+                    <img src="@(string.IsNullOrEmpty(ViewBag.Avatar as string) ? "/images/avatar/admin.jpg" : ViewBag.Avatar)" alt="管理员头像" />
+                </div>
+            </div>
+
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
