@@ -11,6 +11,34 @@
     <link rel="stylesheet" href="~/css/doctor-layout.css" />
 
     @RenderSection("Styles", required: false)
+    <style>
+        /* 新增：消息通知样式（不影响原有布局） */
+        .message-box {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            max-height: 400px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            padding: 10px;
+            z-index: 9999;
+            overflow-y: auto;
+        }
+        .chat-item {
+            padding: 5px;
+            margin: 5px 0;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .order-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+    </style>
 </head>
 <body>
     <div class="doctor-wrapper">
@@ -24,11 +52,11 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a href="/Doctor/Index" class="nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+                <a href="/DoctorHome/Index" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "DoctorHome" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
                     <i class="fas fa-home"></i>
                     <span>首页</span>
                 </a>
-                <a href="/Doctor/Appointments" class="nav-item">
+                <a href="/Appointments/Index" class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Appointments" ? "active" : "")">
                     <i class="fas fa-calendar-check"></i>
                     <span>预约管理</span>
                 </a>
@@ -91,6 +119,11 @@
         </div>
     </div>
 
+    <!-- 新增：消息通知容器 -->
+    <div class="message-box" id="messageBox">
+        <h4>消息通知</h4>
+    </div>
+
     @RenderSection("Scripts", required: false)
 
     <script>
@@ -99,9 +132,71 @@
             document.querySelector('.doctor-sidebar').classList.toggle('collapsed');
             document.querySelector('.doctor-main').classList.toggle('expanded');
         });
+
+        // ====================== WebSocket 核心代码 ======================
+        let ws;
+        // 连接后端WebSocket
+        function connectWebSocket() {
+            // 生产环境替换为你的域名 ws://xxx.com/Websocket
+            const wsUrl = `ws://${window.location.host}/Websocket`;
+            ws = new WebSocket(wsUrl);
+
+            // 连接成功
+            ws.onopen = function () {
+                console.log("医生端WebSocket连接成功");
+            };
+
+            // 接收后端消息（聊天+订单）
+            ws.onmessage = function (event) {
+                const msg = JSON.parse(event.data);
+                const messageBox = document.getElementById('messageBox');
+
+                switch (msg.Type) {
+                    // 接收聊天消息
+                    case "chat":
+                        const chatHtml = `
+                            <div class="chat-item">
+                                <p>${msg.Time}</p>
+                                <p>患者消息：${msg.Data}</p>
+                            </div>
+                        `;
+                        messageBox.innerHTML += chatHtml;
+                        break;
+
+                    // 接收订单/预约列表
+                    case "order":
+                        const orderList = msg.Data;
+                        let orderHtml = `<div class="order-item"><p>${msg.Time} 新预约</p>`;
+                        orderList.forEach(order => {
+                            orderHtml += `
+                                <p>订单号：${order.Orid}</p>
+                                <p>宠物：${order.CatName}</p>
+                                <p>状态：${order.Status}</p>
+                                <hr>
+                            `;
+                        });
+                        orderHtml += `</div>`;
+                        messageBox.innerHTML += orderHtml;
+                        break;
+                }
+                // 滚动到底部
+                messageBox.scrollTop = messageBox.scrollHeight;
+            };
+
+            // 断开重连
+            ws.onclose = function () {
+                console.log("连接断开，5秒后重连...");
+                setTimeout(connectWebSocket, 5000);
+            };
+
+            // 连接错误
+            ws.onerror = function () {
+                console.log("WebSocket连接失败");
+            };
+        }
+
+        // 页面加载后自动连接
+        window.onload = connectWebSocket;
     </script>
 </body>
 </html>
-<script>
-    
-</script>

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication4.Controllers.DoctorLogin
 {
-     [AllowAnonymous]
+    [AllowAnonymous]
     public class DoctorLoginController : Controller
     {   
         private readonly string _conStr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
@@ -30,14 +30,20 @@ namespace WebApplication4.Controllers.DoctorLogin
                 
                 if (await CheckLogin(id, pwd))
                 {
+                    // 生成登录令牌（可选）
+                    string token = Guid.NewGuid().ToString();
+                    // 存储令牌到数据库（示例，实际应加密存储
+                    await SaveTokenToDatabase(id, token);
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, id),                       
+                        new Claim(ClaimTypes.Name, id),
+                        new Claim(ClaimTypes.Role, "医生"),
+                        new Claim("loginToken", token)                  
                     };
 
-                    var identity = new ClaimsIdentity(claims, "Cookies");
+                    var identity = new ClaimsIdentity(claims, "DoctorAuth");
                     var principal = new ClaimsPrincipal(identity);
-                    await HttpContext.SignInAsync(principal);
+                    await HttpContext.SignInAsync("DoctorAuth", principal);
                     return RedirectToAction("Index", "DoctorHome");
                 }
                 else
@@ -52,7 +58,7 @@ namespace WebApplication4.Controllers.DoctorLogin
         {
             using (MySqlConnection conn = new MySqlConnection(_conStr))
             {
-                string sql = "SELECT Count(*) FROM doctors WHERE id = @id AND pwd = @pwd";
+                string sql = "SELECT Count(*) FROM doctors WHERE did = @id AND pwd = @pwd";
                 await conn.OpenAsync();
                 using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                 {
@@ -63,6 +69,20 @@ namespace WebApplication4.Controllers.DoctorLogin
                 }
             }
          }
+        public async Task SaveTokenToDatabase(string id, string token)
+        {
+            using (MySqlConnection conn = new MySqlConnection(_conStr))
+            {
+                string sql = "UPDATE doctors SET token = @token WHERE did = @id";
+                await conn.OpenAsync();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@token", token);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
+        
     }
-          
 }

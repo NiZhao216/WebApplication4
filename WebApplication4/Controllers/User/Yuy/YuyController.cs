@@ -2,17 +2,29 @@
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using System.Collections.Generic;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WebApplication4.Models;
+using webmsg;
+using WebSocketdemo;
+using Websocket.Controllers;
 namespace WebApplication4.Controllers.Yuy
 {
  
+   
    [Authorize]
     public class YuyController : Controller
     {
        
+        public  WebSocketHub _hub;
+
+        public YuyController(WebSocketHub s)
+        {
+            _hub = s;
+        }
         private readonly string _conStr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
-    
+        
         public async Task<IActionResult> Index()
         {
             List<Cats> cats = await Getcats();
@@ -39,7 +51,8 @@ namespace WebApplication4.Controllers.Yuy
                     cmd.Parameters.AddWithValue("@DoctorName", od.DoctorName);
                     if(await cmd.ExecuteNonQueryAsync() > 0)
                     {
-                        TempData["Message"] = "预约成功";
+                        
+                        await WebsocketController.HandleOrderQuery(od.DoctorName, "医生");
                         return RedirectToAction("Index","Order");
                     }
                     else
@@ -79,7 +92,7 @@ namespace WebApplication4.Controllers.Yuy
                         {
                             // 将读取到的数据添加到列表中
                             list.Add(new Cats()  
-                            { Id = reader["id"] != DBNull.Value ? Convert.ToInt32(reader["id"]) : 0,
+                            { CatId = reader["catid"] != DBNull.Value ? Convert.ToInt32(reader["catid"]) : 0,
                         CatName = reader["catname"] != DBNull.Value ? reader["catname"].ToString() : string.Empty,
                         Gender = reader["gender"] != DBNull.Value ? reader["gender"].ToString() : string.Empty,
                         Age = reader["age"] != DBNull.Value ? reader["age"].ToString() : string.Empty,

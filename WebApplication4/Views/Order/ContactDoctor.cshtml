@@ -12,7 +12,7 @@
 
     <div class="order-card">
         <div class="order-header-info">
-            <div class="order-id">订单号: @Model.Id</div>
+            <div class="order-id">订单号: @Model.Orid</div>
             <div class="order-status @GetStatusClass(Model.Status)">@Model.Status</div>
         </div>
 
@@ -44,7 +44,7 @@
             <h3><i class="fas fa-envelope"></i> 发送消息给医生</h3>
             <form method="post" action="@Url.Action("SendMessage", "Order")">
                 @Html.AntiForgeryToken()
-                <input type="hidden" name="orderId" value="@Model.Id" />
+                <input type="hidden" name="orderId" value="@Model.Orid" />
                 <div class="form-group">
                     <label for="message">消息内容:</label>
                     <textarea id="message" name="message" class="form-control" rows="5" required></textarea>

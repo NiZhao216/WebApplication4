@@ -30,9 +30,9 @@ namespace WebApplication4.Controllers.DoctorsManagement
             {
                 // SQL：排序 + 分页
                 string sql = @"
-                    SELECT id, doctor_name, gender, department, title, status
+                    SELECT did, doctor_name, gender, department, title, status
                     FROM doctors
-                    ORDER BY id DESC
+                    ORDER BY did DESC
                     LIMIT @Offset, @PageSize;";
 
                 await conn.OpenAsync();
@@ -51,7 +51,7 @@ namespace WebApplication4.Controllers.DoctorsManagement
                             {
                                 Doctors doctor = new Doctors();
                                 // 安全取值，避免空值报错
-                                doctor.DoctorId = reader.GetInt32("id");
+                                doctor.DoctorId = reader.GetInt32("did");
                                 doctor.DoctorName = reader.GetString("doctor_name") ?? "";
                                 doctor.Gender = reader.GetString("gender") ?? "";
                                 doctor.Department = reader.GetString("department") ?? "";

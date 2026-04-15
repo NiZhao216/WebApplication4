@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication4.Controllers.DoctorHome
 {
-    [AllowAnonymous]
+    [Authorize(AuthenticationSchemes = "DoctorAuth", Roles = "医生")]
     public class DoctorHomeController : Controller
     {
         public IActionResult Index()

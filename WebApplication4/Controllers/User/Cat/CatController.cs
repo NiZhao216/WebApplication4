@@ -71,7 +71,7 @@ namespace WebApplication4.Controllers.Cat
             {
                 TempData["ERR"] = "猫咪名称不能为空，请输入后再保存！";
                 // 跳转回对应页面
-                return cat.Id > 0
+                return cat.CatId > 0
                     ? RedirectToAction("Index", new { catName = cat.CatName })
                     : RedirectToAction("InCreatedex");
             }
@@ -81,17 +81,17 @@ namespace WebApplication4.Controllers.Cat
                 await conn.OpenAsync();
 
                 // ====================== 1. 重名校验（通用）======================
-                bool exists = await CheckCatNameExists(conn, cat.Id, username, cat.CatName);
+                bool exists = await CheckCatNameExists(conn, cat.CatId, username, cat.CatName);
                 if (exists)
                 {
                     TempData["ERR"] = "猫咪名称已存在，请重新输入！";
-                    return cat.Id > 0
+                    return cat.CatId > 0
                         ? RedirectToAction("Index", new { catName = cat.CatName })
                         : RedirectToAction("InCreatedex");
                 }
 
                 // ====================== 2. 分支执行：新增 OR 编辑 ======================
-                if (cat.Id == 0)
+                if (cat.CatId == 0)
                 {
                     string insertSql = @"
                         INSERT INTO userscat (
@@ -130,11 +130,11 @@ namespace WebApplication4.Controllers.Cat
                             dewormstatus = @dewormstatus,
                             nextdewormdate = @nextdewormdate,
                             avatar=@avatar
-                        WHERE id = @id;";
+                        WHERE catid = @id;";
 
                     using (var cmd = new MySqlCommand(updateSql, conn))
                     {
-                        cmd.Parameters.AddWithValue("@id", cat.Id); // 主键Id
+                        cmd.Parameters.AddWithValue("@id", cat.CatId); // 主键Id
                         AddParameters(cmd, cat, username, filePath);
                         await cmd.ExecuteNonQueryAsync();
                     }
@@ -167,7 +167,7 @@ namespace WebApplication4.Controllers.Cat
                         {
                             return new Cats
                             {
-                                Id = reader.GetInt32("id"),
+                                CatId = reader.GetInt32("catid"),
                                 CatName = reader["catname"]?.ToString() ?? "",
                                 Gender = reader["gender"]?.ToString() ?? "",
                                 Age = reader["age"]?.ToString() ?? "",

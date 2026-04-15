@@ -34,8 +34,10 @@
                         <label><i class="fas fa-user icon-blue"></i> 主人姓名</label>
                         <input type="text" name="UserName" class="form-control" value="@User.Identity?.Name" readonly>
                     </div>
-                    <input type="hidden" id="Doctorjs" name="DoctorName"/> 
+                    <input type="hidden" id="Doctorjs" name="DoctorName"/>
+                    <input type="hidden" id="Orid" name="DoctorId"/> 
                     <input type="hidden" id="Catjs" name="CatName" />
+                    <input type="hidden" id="CatIdjs" name="CatId" />
                     <!-- 选择宠物 -->
                     <div class="form-group cat-select-group">
                         <label><i class="fas fa-cat icon-blue"></i> 选择宠物</label>
@@ -46,7 +48,7 @@
                                 {
                                     @foreach (var cat in Model.Item1)
                                     {
-                                        <option value="@cat.Id">@cat.CatName</option>
+                                        <option value="@cat.CatId">@cat.CatName</option>
                                     }
                                 }
                             </select>
@@ -136,6 +138,11 @@
     var selectedDoctorOption = doctorSelect.options[doctorSelect.selectedIndex];
     doctorNameInput.value = selectedDoctorOption.text;
     
+    var doctorIdInput = document.getElementById("Orid");
+    doctorIdInput.value = selectedDoctorOption.value;
+
+    var catIdInput = document.getElementById("CatIdjs");
+    catIdInput.value = catSelect.value;
     return true;
 
     }

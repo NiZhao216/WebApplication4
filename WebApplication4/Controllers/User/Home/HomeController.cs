@@ -9,7 +9,9 @@ namespace WebApplication4.Controllers.Home
     /// <summary>
     /// 需要普通用户角色才能访问的首页控制器
     /// </summary>
-    [Authorize(Roles ="普通用户")]
+   
+    [Authorize(AuthenticationSchemes = "UserAuth", Roles = "用户")]
+    
     public class HomeController : Controller
     {
         /// <summary>
@@ -54,7 +56,7 @@ namespace WebApplication4.Controllers.Home
                                 age = reader["age"]?.ToString() ?? string.Empty,
                                 sex = reader["sex"]?.ToString() ?? string.Empty,
                                 by = reader["bry"] as DateTime?,
-                                id = (int)reader["id"],
+                                userid = (int)reader["userid"],
                                 avatar = reader["Avatar"]?.ToString() ?? string.Empty
                             };
                         }

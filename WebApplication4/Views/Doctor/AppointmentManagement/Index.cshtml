@@ -1,0 +1,184 @@
+@model List<WebApplication4.Models.Orders>
+@{
+    ViewBag.Title = "预约管理";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+}
+<link href="~/css/doctor-home.css" rel="stylesheet" />
+<link href="~/css/doctor-appointment.css" rel="stylesheet" />
+
+<div class="doctor-home-page">
+    <!-- 统计卡片区域 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon stat-blue">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">12</div>
+                <div class="stat-label">今日预约</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-green">
+                <i class="fas fa-user-injured"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">8</div>
+                <div class="stat-label">待诊患者</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-orange">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">5</div>
+                <div class="stat-label">待确认预约</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-purple">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">15</div>
+                <div class="stat-label">已完成预约</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选区域 -->
+    <div class="filter-section">
+        <div class="filter-group">
+            <label>预约状态：</label>
+            <select class="filter-select">
+                <option value="">全部</option>
+                <option value="待确认">待确认</option>
+                <option value="已确认">已确认</option>
+                <option value="已完成">已完成</option>
+                <option value="已取消">已取消</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>预约日期：</label>
+            <input type="date" class="filter-input" />
+        </div>
+        <div class="filter-group">
+            <label>患者姓名：</label>
+            <input type="text" class="filter-input" placeholder="输入患者姓名" />
+        </div>
+        <button class="btn btn-primary">
+            <i class="fas fa-search"></i> 搜索
+        </button>
+        <button class="btn btn-reset">
+            <i class="fas fa-redo"></i> 重置
+        </button>
+    </div>
+
+    <!-- 预约列表 -->
+    <div class="appointments-container">
+        @if (Model != null && Model.Count > 0)
+        {
+            @foreach (var appointment in Model)
+            {
+                <div class="appointment-card">
+                    <div class="appointment-header">
+                        <div class="appointment-id">预约号: @appointment.Orid</div>
+                        <div class="appointment-status @GetStatusClass(appointment.Status)">@appointment.Status</div>
+                    </div>
+
+                    <div class="appointment-body">
+                        <div class="appointment-info-row">
+                            <div class="appointment-info-item">
+                                <span class="info-label"><i class="fas fa-cat"></i> 宠物名称:</span>
+                                <span class="info-value">@appointment.CatName</span>
+                            </div>
+                            <div class="appointment-info-item">
+                                <span class="info-label"><i class="fas fa-user"></i> 预约人:</span>
+                                <span class="info-value">@appointment.UserName</span>
+                            </div>
+                        </div>
+
+                        <div class="appointment-info-row">
+                            <div class="appointment-info-item">
+                                <span class="info-label"><i class="fas fa-stethoscope"></i> 预约项目:</span>
+                                <span class="info-value">@appointment.ServiceType</span>
+                            </div>
+                            <div class="appointment-info-item">
+                                <span class="info-label"><i class="fas fa-calendar-alt"></i> 预约时间:</span>
+                                <span class="info-value">@appointment.AppointmentTime.ToString("yyyy-MM-dd HH:mm")</span>
+                            </div>
+                        </div>
+
+                        <div class="appointment-info-row">
+                            <div class="appointment-info-item">
+                                <span class="info-label"><i class="fas fa-phone"></i> 联系电话:</span>
+                                <span class="info-value">@appointment.Phone</span>
+                            </div>
+                            <div class="appointment-info-item">
+                                <span class="info-label"><i class="fas fa-clock"></i> 下单时间:</span>
+                                <span class="info-value">@appointment.CreateTime.ToString("yyyy-MM-dd HH:mm")</span>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(appointment.Description))
+                        {
+                            <div class="appointment-description">
+                                <span class="info-label"><i class="fas fa-comment-medical"></i> 症状/需求描述:</span>
+                                <p class="info-value">@appointment.Description</p>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="appointment-footer">
+                        @if (appointment.Status == "待确认")
+                        {
+                            <a href="@Url.Action("Confirm", "AppointmentManagement", new { id = appointment.Orid })" class="btn btn-confirm" style="text-decoration: none !important;">
+                                <i class="fas fa-check"></i> 确认预约
+                            </a>
+                            <a href="@Url.Action("Cancel", "AppointmentManagement", new { id = appointment.Orid })" class="btn btn-cancel" style="text-decoration: none !important;">
+                                <i class="fas fa-times"></i> 取消预约
+                            </a>
+                        }
+                        else if (appointment.Status == "已确认")
+                        {
+                            <a href="@Url.Action("Complete", "AppointmentManagement", new { id = appointment.Orid })" class="btn btn-complete" style="text-decoration: none !important;">
+                                <i class="fas fa-check-circle"></i> 完成预约
+                            </a>
+                            <a href="@Url.Action("Details", "AppointmentManagement", new { id = appointment.Orid })" class="btn btn-details" style="text-decoration: none !important;">
+                                <i class="fas fa-info-circle"></i> 查看详情
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Details", "AppointmentManagement", new { id = appointment.Orid })" class="btn btn-details" style="text-decoration: none !important;">
+                                <i class="fas fa-info-circle"></i> 查看详情
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>暂无预约记录</p>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    public string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "待确认" => "status-pending",
+            "已确认" => "status-confirmed",
+            "已完成" => "status-completed",
+            "已取消" => "status-cancelled",
+            _ => ""
+        };
+    }
+}
