@@ -10,7 +10,7 @@ namespace WebApplication4.Models
         /// <summary>
         /// 猫咪的唯一标识符
         /// </summary>
-        public int Id { get; set; } 
+        public int CatId { get; set; } 
         // 猫咪昵称
         public string CatName { get; set; } = string.Empty;
         // 性别

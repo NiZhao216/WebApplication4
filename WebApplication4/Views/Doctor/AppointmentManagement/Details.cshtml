@@ -1,0 +1,111 @@
+@model WebApplication4.Models.Orders
+@{
+    ViewBag.Title = "预约详情";
+    Layout = "~/Views/Shared/_DoctorLayout.cshtml";
+}
+<link href="~/css/doctor-home.css" rel="stylesheet" />
+<link href="~/css/doctor-appointment.css" rel="stylesheet" />
+
+<div class="doctor-home-page">
+    <div class="appointments-container">
+        <div class="appointment-detail-card">
+            <!-- 预约头部 -->
+            <div class="appointment-detail-header">
+                <h2><i class="fas fa-calendar-check"></i> 预约详情</h2>
+                <div class="appointment-status-badge @GetStatusClass(Model?.Status)">
+                    @Model?.Status
+                </div>
+            </div>
+
+            <!-- 预约信息 -->
+            <div class="appointment-detail-body">
+                <div class="detail-section">
+                    <h3><i class="fas fa-info-circle"></i> 基本信息</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">预约编号：</span>
+                        <span class="detail-value">@Model?.Orid</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">预约状态：</span>
+                        <span class="detail-value">@Model?.Status</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">下单时间：</span>
+                        <span class="detail-value">@Model?.CreateTime.ToString("yyyy-MM-dd HH:mm")</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-user"></i> 患者信息</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">预约人：</span>
+                        <span class="detail-value">@Model?.UserName</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">宠物名称：</span>
+                        <span class="detail-value">@Model?.CatName</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">联系电话：</span>
+                        <span class="detail-value">@Model?.Phone</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3><i class="fas fa-stethoscope"></i> 预约信息</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">预约项目：</span>
+                        <span class="detail-value">@Model?.ServiceType</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">预约时间：</span>
+                        <span class="detail-value">@Model?.AppointmentTime.ToString("yyyy-MM-dd HH:mm")</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model?.Description))
+                    {
+                        <div class="detail-row">
+                            <span class="detail-label">症状描述：</span>
+                            <span class="detail-value">@Model?.Description</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="appointment-detail-footer">
+                <a href="@Url.Action("Index", "AppointmentManagement")" class="btn btn-back" style="text-decoration: none !important;">
+                    <i class="fas fa-arrow-left"></i> 返回列表
+                </a>
+                @if (Model?.Status == "待确认")
+                {
+                    <a href="@Url.Action("Confirm", "AppointmentManagement", new { id = Model.Orid })" class="btn btn-confirm" style="text-decoration: none !important;">
+                        <i class="fas fa-check"></i> 确认预约
+                    </a>
+                    <a href="@Url.Action("Cancel", "AppointmentManagement", new { id = Model.Orid })" class="btn btn-cancel" style="text-decoration: none !important;">
+                        <i class="fas fa-times"></i> 取消预约
+                    </a>
+                }
+                else if (Model?.Status == "已确认")
+                {
+                    <a href="@Url.Action("Complete", "AppointmentManagement", new { id = Model.Orid })" class="btn btn-complete" style="text-decoration: none !important;">
+                        <i class="fas fa-check-circle"></i> 完成预约
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "待确认" => "status-pending",
+            "已确认" => "status-confirmed",
+            "已完成" => "status-completed",
+            "已取消" => "status-cancelled",
+            _ => ""
+        };
+    }
+}

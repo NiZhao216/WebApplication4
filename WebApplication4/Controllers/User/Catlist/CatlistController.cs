@@ -5,6 +5,7 @@ using WebApplication4.Models;
 
 namespace WebApplication4.Controllers.Catlist
 {
+    [Authorize]
     public class CatlistController : Controller
     {
 

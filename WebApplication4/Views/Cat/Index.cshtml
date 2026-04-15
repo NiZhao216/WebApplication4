@@ -34,7 +34,7 @@
 
         <form method="post" action="/Cat/SaveCat" class="pet-card" enctype="multipart/form-data">
             <!-- ✅ 核心修复：猫咪ID隐藏域（解决编辑变新建） -->
-            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="Id" value="@Model.CatId" />
             <input type="hidden" name="oldavatar" value="@Model.avatar" />
 
             <!-- 基础信息 -->

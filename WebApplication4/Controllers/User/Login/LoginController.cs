@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebApplication4.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication4.Controllers.Login
 {
     /// <summary>
     /// 登录控制器，处理用户登录、登出及用户信息获取功能
     /// </summary>
+    [AllowAnonymous]
     public class LoginController : Controller
     {
         // 数据库连接字符串，用于连接MySQL数据库
@@ -49,7 +51,7 @@ namespace WebApplication4.Controllers.Login
                     await conn.OpenAsync();
 
                     // 先按用户名取出存储的哈希和角色
-                    string sql = "SELECT pwd, role FROM userstable WHERE username = @username";
+                    string sql = "SELECT pwd FROM userstable WHERE username = @username";
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@username", username);
@@ -58,35 +60,8 @@ namespace WebApplication4.Controllers.Login
                             if (await reader.ReadAsync())
                             {
                                 string storedHash = reader["pwd"]?.ToString() ?? string.Empty;
-                                string role = reader["role"]?.ToString() ?? string.Empty;
-                                if(role == "管理员"&&storedHash == password)
-                                {
-                                     string token = Guid.NewGuid().ToString();
-                                    // reader may still be open if not rehash; ensure closed before update
-                                    if (!reader.IsClosed) reader.Close();
-                                    string sql2 = "UPDATE userstable SET token=@token WHERE username=@username";
-                                    using (MySqlCommand tocmd = new MySqlCommand(sql2, conn))
-                                    {
-                                        tocmd.Parameters.AddWithValue("@token", token);
-                                        tocmd.Parameters.AddWithValue("@username", username);
-                                        int num = await tocmd.ExecuteNonQueryAsync();
-                                        if (!(num > 0))
-                                        {
-                                            return View();
-                                        }
-                                    }
-
-                                    var claims = new List<Claim>
-                                    {
-                                        new Claim(ClaimTypes.Name, username),
-                                        new Claim(ClaimTypes.Role, role),
-                                        new Claim("logintoken", token)
-                                    };
-
-                                    var identity = new ClaimsIdentity(claims, "Cookies");
-                                    await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
-                                   return RedirectToAction("Index", "Admin");
-                                }
+                                
+                               
                                 var hasher = new PasswordHasher<object>();
                                 var verifyResult = hasher.VerifyHashedPassword(null, storedHash, password);
 
@@ -125,12 +100,12 @@ namespace WebApplication4.Controllers.Login
                                     var claims = new List<Claim>
                                     {
                                         new Claim(ClaimTypes.Name, username),
-                                        new Claim(ClaimTypes.Role, role),
+                                        new Claim(ClaimTypes.Role, "用户"),
                                         new Claim("logintoken", token)
                                     };
 
-                                    var identity = new ClaimsIdentity(claims, "Cookies");
-                                    await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
+                                    var identity = new ClaimsIdentity(claims, "UserAuth");
+                                    await HttpContext.SignInAsync("UserAuth", new ClaimsPrincipal(identity));
                                    
                                     return RedirectToAction("Index","Home");
                                 }
@@ -190,7 +165,7 @@ namespace WebApplication4.Controllers.Login
 
             }
             // 异步执行Cookie登出
-            await HttpContext.SignOutAsync("Cookies");
+            await HttpContext.SignOutAsync("UserAuth");
             // 重定向到登录页面的Index动作
             return RedirectToAction("Index", "Login");
         }
@@ -230,7 +205,7 @@ namespace WebApplication4.Controllers.Login
                                 age = reader["age"]?.ToString() ?? string.Empty,
                                 sex = reader["sex"]?.ToString() ?? string.Empty,
                                 by = reader["bry"] as DateTime?,
-                                id = (int)reader["id"],
+                                userid = (int)reader["userid"],
                                 avatar = reader["Avatar"]?.ToString() ?? string.Empty
                             };
                         }

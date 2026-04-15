@@ -35,7 +35,7 @@ namespace WebApplication4.Controllers.UserCenter
         private readonly string constr = "Server=localhost;Port=3306;Database=users;Uid=abc;Pwd=123456;CharSet=utf8mb4;";
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(int id, string username, string email, string phone, string age, string sex, DateTime? by, string address,string pr,IFormFile avatar,string oldAvatar)
+        public async Task<IActionResult> Save(int userid, string username, string email, string phone, string age, string sex, DateTime? by, string address,string pr,IFormFile avatar,string oldAvatar)
         {
             // Basic server-side validation (can be expanded)
             if (string.IsNullOrWhiteSpace(username))
@@ -65,7 +65,7 @@ WHERE
     AND 
     NOT EXISTS (
         SELECT 1 FROM (
-            SELECT username FROM userstable WHERE username = @username AND id != @id
+            SELECT username FROM userstable WHERE username = @username AND userid != @id
         ) AS temp
     )
 ";
@@ -79,7 +79,7 @@ WHERE
                 cmd.Parameters.AddWithValue("@sex", sex);
                 cmd.Parameters.AddWithValue("@address", address);
                 cmd.Parameters.AddWithValue("@pr", pr);
-                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@id", userid);
                 string filePath = string.Empty; // 默认头像路径
                 if (avatar != null && avatar.Length >= 0)
                 {
@@ -106,13 +106,13 @@ WHERE
                     if (User.Identity!.Name != username)
                     {
                         // 1. 取出原来的权限角色
-                        string role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value!;
+                        
 
                         // 2. 只用 用户名 + 权限 重新生成（干净！）
                         var newClaims = new List<Claim>
                          {
                               new Claim(ClaimTypes.Name, username),
-                              new Claim(ClaimTypes.Role, role), // 权限还在！
+                              new Claim(ClaimTypes.Role, "用户"), // 权限还在！
                               new Claim("logintoken", User.FindFirstValue("logintoken")!)
                           };
 
@@ -157,7 +157,7 @@ WHERE
                                 age = reader["age"]?.ToString() ?? string.Empty,
                                 sex = reader["sex"]?.ToString() ?? string.Empty,
                                 by = reader["bry"] as DateTime?,
-                                id = (int)reader["id"],
+                                userid = (int)reader["userid"],
                                 address= reader["address"]?.ToString() ?? string.Empty,
                                 avatar= reader["avatar"]?.ToString() ?? string.Empty
                             };

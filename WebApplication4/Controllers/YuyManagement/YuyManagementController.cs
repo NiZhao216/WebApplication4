@@ -47,7 +47,7 @@ namespace WebApplication4.Controllers.YuyManagement
 
                         Orders order = new Orders
                         {
-                            Id = reader["id"] != DBNull.Value ? Convert.ToInt32(reader["id"]) : 0,
+                            Orid = reader["orid"] != DBNull.Value ? Convert.ToInt32(reader["orid"]) : 0,
                             UserName = reader["username"] != DBNull.Value ? reader["username"].ToString() : string.Empty,
                             CatId = reader["catid"] != DBNull.Value ? Convert.ToInt32(reader["catid"]) : 0,
                             CatName = reader["catname"] != DBNull.Value ? reader["catname"].ToString() : string.Empty,

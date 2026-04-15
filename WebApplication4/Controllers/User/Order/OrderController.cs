@@ -32,7 +32,7 @@ namespace WebApplication4.Controllers.Order
                         {
                             orders.Add(new Orders
                             {
-                                Id = reader["id"] != DBNull.Value ? Convert.ToInt32(reader["id"]) : 0,
+                                Orid = reader["orid"] != DBNull.Value ? Convert.ToInt32(reader["orid"]) : 0,
                                 UserName = reader["username"] != DBNull.Value ? reader["username"].ToString() : string.Empty,
                                 CatId = reader["catid"] != DBNull.Value ? Convert.ToInt32(reader["catid"]) : 0,
                                 CatName = reader["catname"] != DBNull.Value ? reader["catname"].ToString() : string.Empty,
@@ -43,6 +43,7 @@ namespace WebApplication4.Controllers.Order
                                 DoctorId = reader["did"] != DBNull.Value ? Convert.ToInt32(reader["did"]) : 0,
                                 DoctorName = reader["doctor_name"] != DBNull.Value ? reader["doctor_name"].ToString() : string.Empty,
                                 Status = reader["status"] != DBNull.Value ? reader["status"].ToString() : string.Empty,
+                                CreateTime = reader["createtime"] != DBNull.Value ? Convert.ToDateTime(reader["createtime"]) : DateTime.MinValue,
                             });
                         }
                     }
@@ -51,36 +52,60 @@ namespace WebApplication4.Controllers.Order
             return orders;
         }
 
+        /// <summary>
+        /// 根据订单ID获取订单信息
+        /// </summary>
+        /// <param name="orderId">订单ID</param>
+        /// <returns>返回一个Orders对象，包含订单的详细信息；如果未找到订单则返回null</returns>
         public async Task<Orders> GetOrderById(int orderId)
         {
+            // 使用using语句确保数据库连接在使用后被正确关闭和释放
             using (var con = new MySqlConnection(_conStr))
             {
+                // 异步打开数据库连接
                 await con.OpenAsync();
-                using (var cmd = new MySqlCommand("SELECT * FROM orders WHERE id = @Id", con))
+                // 创建并配置SQL命令，使用参数化查询防止SQL注入
+                using (var cmd = new MySqlCommand("SELECT * FROM orders WHERE orid = @Id", con))
                 {
+                    // 向命令中添加参数
                     cmd.Parameters.AddWithValue("@Id", orderId);
+                    // 使用using语句确保数据阅读器在使用后被正确关闭和释放
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
+                        // 检查是否有数据可读
                         if (await reader.ReadAsync())
                         {
+                            // 创建并填充Orders对象，处理可能的DBNull值
                             return new Orders
                             {
-                                Id = reader["id"] != DBNull.Value ? Convert.ToInt32(reader["id"]) : 0,
+                                // 订单ID，如果值为DBNull则设为0
+                                Orid = reader["orid"] != DBNull.Value ? Convert.ToInt32(reader["orid"]) : 0,
+                                // 用户名，如果值为DBNull则设为空字符串
                                 UserName = reader["username"] != DBNull.Value ? reader["username"].ToString() : string.Empty,
+                                // 分类ID，如果值为DBNull则设为0
                                 CatId = reader["catid"] != DBNull.Value ? Convert.ToInt32(reader["catid"]) : 0,
+                                // 分类名称，如果值为DBNull则设为空字符串
                                 CatName = reader["catname"] != DBNull.Value ? reader["catname"].ToString() : string.Empty,
+                                // 电话号码，如果值为DBNull则设为空字符串
                                 Phone = reader["phone"] != DBNull.Value ? reader["phone"].ToString() : string.Empty,
+                                // 服务类型，如果值为DBNull则设为空字符串
                                 ServiceType = reader["servicetype"] != DBNull.Value ? reader["servicetype"].ToString() : string.Empty,
+                                // 预约时间，如果值为DBNull则设为最小日期值
                                 AppointmentTime = reader["appointmenttime"] != DBNull.Value ? Convert.ToDateTime(reader["appointmenttime"]) : DateTime.MinValue,
+                                // 描述信息，如果值为DBNull则设为空字符串
                                 Description = reader["description"] != DBNull.Value ? reader["description"].ToString() : string.Empty,
+                                // 医生ID，如果值为DBNull则设为0
                                 DoctorId = reader["did"] != DBNull.Value ? Convert.ToInt32(reader["did"]) : 0,
+                                // 医生姓名，如果值为DBNull则设为空字符串
                                 DoctorName = reader["doctor_name"] != DBNull.Value ? reader["doctor_name"].ToString() : string.Empty,
+                                // 订单状态，如果值为DBNull则设为空字符串
                                 Status = reader["status"] != DBNull.Value ? reader["status"].ToString() : string.Empty,
                             };
                         }
                     }
                 }
             }
+            // 如果未找到订单，返回null
             return null;
         }
 

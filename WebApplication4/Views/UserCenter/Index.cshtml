@@ -62,7 +62,7 @@
         <!-- ID（只读） -->
         <div class="form-item">
             <label>id</label>
-            <input type="text" name="id" value="@Model.id" readonly />
+            <input type="text" name="userid" value="@Model.userid" readonly />
         </div>
 
         <!-- 邮箱 -->
@@ -86,7 +86,7 @@
         <!-- 性别 -->
         <div class="form-item">
             <label>性别</label>
-            <select name="Sex">
+            <select name="sex">
                 <option value="未知" @(Model.sex == "未知" ? "selected" : "")>未知</option>
                 <option value="男" @(Model.sex == "男" ? "selected" :string.Empty)>男</option>
                 <option value="女" @(Model.sex == "女" ? "selected" : null)>女</option>

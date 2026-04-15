@@ -40,7 +40,7 @@
                         @foreach (var order in Model)
                         {
                             <tr>
-                                <td>@order.Id</td>
+                                <td>@order.Orid</td>
                                 <td>@order.UserName</td>
                                 <td>@order.CatName</td>
                                 <td>@order.ServiceType</td>
@@ -51,15 +51,15 @@
                                 <td>
                                     @if (order.Status == "待确认")
                                     {
-                                        <button class="btn btn-sm btn-primary" onclick="updateOrderStatus(@order.Id, '已确认')">确认</button>
+                                        <button class="btn btn-sm btn-primary" onclick="updateOrderStatus(@order.Orid, '已确认')">确认</button>
                                     }
                                     @if (order.Status == "已确认")
                                     {
-                                        <button class="btn btn-sm btn-primary" onclick="updateOrderStatus(@order.Id, '已完成')">完成</button>
+                                        <button class="btn btn-sm btn-primary" onclick="updateOrderStatus(@order.Orid, '已完成')">完成</button>
                                     }
                                     @if (order.Status == "待确认" || order.Status == "已确认")
                                     {
-                                        <button class="btn btn-sm btn-danger" onclick="updateOrderStatus(@order.Id, '已取消')">取消</button>
+                                        <button class="btn btn-sm btn-danger" onclick="updateOrderStatus(@order.Orid, '已取消')">取消</button>
                                     }
                                 </td>
                             </tr>

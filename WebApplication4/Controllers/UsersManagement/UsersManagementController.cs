@@ -31,10 +31,10 @@ namespace WebApplication4.Controllers.Admin
         {
             // SQL：过滤管理员 + 排序 + 分页
             string sql = @"
-                SELECT id, username, pwd, role
+                SELECT userid, username, pwd, role
                 FROM userstable
                 WHERE role <> '管理员'
-                ORDER BY id DESC
+                ORDER BY userid DESC
                 LIMIT @Offset, @PageSize;";
             await conn.OpenAsync();
             using (MySqlCommand cmd = new MySqlCommand(sql, conn))
@@ -52,10 +52,9 @@ namespace WebApplication4.Controllers.Admin
                         {
                             User user = new User();
                             // 安全取值，避免空值报错
-                            user.id = reader.GetInt32("id");
+                            user.userid = reader.GetInt32("userid");
                             user.username = reader.GetString("username") ?? "";
                             user.pwd = reader.GetString("pwd") ?? "";
-                            user.role = reader.GetString("role") ?? "";
                             userList.Add(user);
                         }
                     }
